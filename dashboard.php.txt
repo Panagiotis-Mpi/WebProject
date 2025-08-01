@@ -1,0 +1,4 @@
+<?php
+require_once '../includes/auth_student.php';
+echo "<h2>Φοιτητής Dashboard</h2>";
+echo "<p><a href='../logout.php'>Αποσύνδεση</a></p>";
