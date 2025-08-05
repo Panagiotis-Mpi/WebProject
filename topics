@@ -1,0 +1,63 @@
+<?php
+session_start();
+header('Content-Type: application/json');
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'professor') {
+    http_response_code(401);
+    echo json_encode(["error" => "Unauthorized"]);
+    exit;
+}
+
+$mysqli = new mysqli("localhost", "root", "", "diplomatiki");
+if ($mysqli->connect_errno) {
+    http_response_code(500);
+    echo json_encode(["error" => "Database connection failed"]);
+    exit;
+}
+
+$professor_id = $_SESSION['user_id'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    // Επιστρέφει λίστα θεμάτων του διδάσκοντα
+    $stmt = $mysqli->prepare("SELECT id, title, summary, pdf_path FROM Topics WHERE creator_id = ?");
+    $stmt->bind_param("i", $professor_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $topics = $result->fetch_all(MYSQLI_ASSOC);
+    echo json_encode($topics);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $title = $_POST['title'] ?? '';
+    $summary = $_POST['summary'] ?? '';
+
+    if (empty($title)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Title is required"]);
+        exit;
+    }
+
+    // Διαχείριση του αρχείου PDF
+    $pdf_path = null;
+    if (isset($_FILES['pdf']) && $_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = "uploads/";
+        if (!file_exists($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+        }
+        $filename = uniqid() . "_" . basename($_FILES["pdf"]["name"]);
+        $pdf_path = $upload_dir . $filename;
+        move_uploaded_file($_FILES["pdf"]["tmp_name"], $pdf_path);
+    }
+
+    // Καταχώρηση στη βάση
+    $stmt = $mysqli->prepare("INSERT INTO Topics (title, summary, pdf_path, creator_id) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("sssi", $title, $summary, $pdf_path, $professor_id);
+    if ($stmt->execute()) {
+        echo json_encode(["success" => true, "topic_id" => $stmt->insert_id]);
+    } else {
+        http_response_code(500);
+        echo json_encode(["error" => "Failed to insert topic"]);
+    }
+}
+?>
