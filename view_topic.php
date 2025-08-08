@@ -1,15 +1,45 @@
 <?php
-session_start();
-require '../db.php';
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
-    header("Location: ../login.php");
-    exit;
-}
+// view_topic.php - Αυτόνομη σελίδα προβολής θεμάτων
+// Σύνδεση με βάση δεδομένων (χωρίς config.php)
+$conn = new PDO('mysql:host=localhost;dbname=diplomatiki;charset=utf8mb4', 
+               'root', 
+               '', 
+               [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+
+// Λήψη όλων των θεμάτων
+$stmt = $conn->query("SELECT id, title, summary FROM Topics");
+$topics = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 <!DOCTYPE html>
-<html lang="el">
-<head><meta charset="UTF-8"><title>Προβολή Θέματος</title></head>
+<html>
+<head>
+    <title>Διαθέσιμα Θέματα Διπλωματικών</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .topic { 
+            border: 1px solid #ddd; 
+            padding: 15px; 
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        h1 { color: #333; }
+    </style>
+</head>
 <body>
-    <h2>Το Θέμα Μου</h2>
-    <p>Εδώ θα εμφανίζονται οι λεπτομέρειες του θέματος διπλωματικής εργασίας.</p>
-</body></html>
+
+<h1>Διαθέσιμα Θέματα Διπλωματικών</h1>
+
+<?php foreach ($topics as $topic): ?>
+    <div class="topic">
+        <h3><?= htmlspecialchars($topic['title']) ?></h3>
+        <p><?= nl2br(htmlspecialchars($topic['summary'] ?? 'Χωρίς περιγραφή')) ?></p>
+    </div>
+<?php endforeach; ?>
+
+<!-- Κουμπί επιστροφής -->
+<button onclick="window.location.href='dashboard.php'">Πίσω στο Dashboard</button>
+
+</body>
+</html>
