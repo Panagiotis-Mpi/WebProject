@@ -17,6 +17,6 @@ VALUES
 ('student5@university.gr', 'abcd', 'Μιχάλης', 'Κατσαντώνης', 'student', 'P2024005');
 
 -- Γραμματεία
-INSERT INTO Users (email, password, first_name, last_name, role, am)
+INSERT INTO Users (email, password, first_name, last_name, role)
 VALUES
 ('secretary1@university.gr', 'admin123', 'Σοφία', 'Παπανικολάου', 'secretary');
