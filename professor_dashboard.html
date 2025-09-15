@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Καθηγητής - Dashboard</title>
+<style>
+body{font-family:Arial; max-width:600px; margin:auto; padding:1rem;}
+h2{text-align:center;}
+ul{list-style:none;padding:0;}
+li{margin:0.5rem 0;}
+button{width:100%; padding:0.5rem; border-radius:5px; cursor:pointer;}
+</style>
+</head>
+<body>
+<h2>Dashboard Διδάσκοντα</h2>
+<ul>
+    <li><button onclick="location.href='professor_view_topics.html'">Προβολή Θεμάτων</button></li>
+    <li><button onclick="location.href='professor/create_topic.html'">Δημιουργία Θεμάτων</button></li>
+    <li><button onclick="location.href='professor/assign_topic.html'">Αρχική Ανάθεση Θέματος</button></li>
+    <li><button onclick="location.href='professor/view_invitations.html'">Προβολή Προσκλήσεων Τριμελούς</button></li>
+    <li><button onclick="location.href='professor/statistics.html'">Προβολή Στατιστικών</button></li>
+    <li><button onclick="location.href='professor/evaluate_theses.html'">Αξιολόγηση Διπλωματικών</button></li>
+</ul>
+<button onclick="logout()">Αποσύνδεση</button>
+<script>
+function logout(){
+    fetch('api/logout.php').then(()=>window.location.href='login.html');
+}
+</script>
+</body>
+</html>
