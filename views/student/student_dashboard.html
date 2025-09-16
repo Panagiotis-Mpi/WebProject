@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Φοιτητής - Dashboard</title>
+<style>
+body{font-family:Arial; max-width:600px; margin:auto; padding:1rem;}
+h2{text-align:center;}
+ul{list-style:none;padding:0;}
+li{margin:0.5rem 0;}
+button{width:100%; padding:0.5rem; border-radius:5px; cursor:pointer;}
+</style>
+</head>
+<body>
+<h2>Dashboard Φοιτητή</h2>
+<ul>
+    <li><button onclick="location.href='view_topic.html'">Προβολή Θέματος</button></li>
+    <li><button onclick="location.href='edit_profile.html'">Επεξεργασία Προφίλ</button></li>
+    <li><button onclick="location.href='manage_thesis.html'">Διαχείριση Διπλωματικής</button></li>
+    <li><button onclick="location.href='invite_professors.html'">Πρόσκληση Καθηγητών σε Τριμελή Επιτροπή</button></li>
+</ul>
+<button onclick="logout()">Αποσύνδεση</button>
+<script>
+function logout(){
+    fetch('../../api/logout.php')
+        .then(()=>window.location.href='../login.html');
+}
+</script>
+</body>
+</html>
