@@ -127,7 +127,8 @@ CREATE TABLE Grades (
         (content_score + organization_score + presentation_score) / 3
     ) STORED,
     FOREIGN KEY (thesis_id) REFERENCES Theses(id) ON DELETE CASCADE,
-    FOREIGN KEY (professor_id) REFERENCES Users(id) ON DELETE CASCADE
+    FOREIGN KEY (professor_id) REFERENCES Users(id) ON DELETE CASCADE,
+    UNIQUE KEY idx_thesis_professor (thesis_id, professor_id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE INDEX idx_grades_thesis ON Grades(thesis_id);
