@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ανάθεση Θέματος</title>
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: auto;
+      padding: 1rem;
+    }
+    h2 { text-align: center; }
+    select, button {
+      width: 100%;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+  <h2>Αρχική Ανάθεση Θέματος</h2>
+
+  <label for="topicSelect">Επιλέξτε Θέμα:</label>
+  <select id="topicSelect"></select>
+
+  <label for="studentSelect">Επιλέξτε Φοιτητή:</label>
+  <select id="studentSelect"></select>
+
+  <button id="assignBtn">Ανάθεση</button>
+
+  <script>
+    // Φόρτωση θεμάτων καθηγητή
+    fetch('../../api/professor/get_professor_topics.php')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const topicSelect = document.getElementById('topicSelect');
+          data.topics.forEach(t => {
+            const option = document.createElement('option');
+            option.value = t.id;
+            option.textContent = t.title;
+            topicSelect.appendChild(option);
+          });
+        } else {
+          alert("❌ Σφάλμα: " + data.message);
+        }
+      });
+
+    // Φόρτωση λίστας φοιτητών
+    fetch('../../api/professor/get_students.php')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const studentSelect = document.getElementById('studentSelect');
+          data.students.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s.id;
+            option.textContent = s.first_name + " " + s.last_name + " (" + s.am + ")";
+            studentSelect.appendChild(option);
+          });
+        }
+      });
+
+    // Ανάθεση θέματος
+    document.getElementById('assignBtn').addEventListener('click', () => {
+      const topicId = document.getElementById('topicSelect').value;
+      const studentId = document.getElementById('studentSelect').value;
+
+      if (!topicId || !studentId) {
+        alert("⚠️ Επιλέξτε θέμα και φοιτητή!");
+        return;
+      }
+
+      fetch('../../api/professor/assign_topic.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic_id: topicId, student_id: studentId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert("Το θέμα ανατέθηκε με επιτυχία!");
+          window.location.href = "professor_dashboard.html";
+        } else {
+          alert("❌ " + data.message);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
