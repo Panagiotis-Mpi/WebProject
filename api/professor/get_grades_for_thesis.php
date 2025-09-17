@@ -17,7 +17,7 @@ if(!$thesis_id){
     exit;
 }
 
-// Έλεγχος αν ο καθηγητής συμμετέχει στη ΔΕ
+// Έλεγχος αν συμμετέχει στη ΔΕ
 $sql_check="SELECT 1 FROM Theses t
 LEFT JOIN CommitteeMembers cm ON cm.thesis_id=t.id AND cm.professor_id=? 
 WHERE t.id=? AND (t.supervisor_id=? OR cm.id IS NOT NULL)";
@@ -31,30 +31,21 @@ if($res->num_rows==0){
 }
 $stmt->close();
 
-// Παίρνουμε τα σκορ του τρέχοντος καθηγητή
-$sql="SELECT content_score, organization_score, presentation_score
-      FROM Grades
-      WHERE thesis_id=? AND professor_id=?";
+// Παίρνουμε όλους τους βαθμούς
+$sql="SELECT g.professor_id, u.first_name, u.last_name, g.content_score, g.organization_score, g.presentation_score, g.final_grade
+      FROM Grades g
+      JOIN Users u ON u.id=g.professor_id
+      WHERE g.thesis_id=?";
 $stmt=$conn->prepare($sql);
-$stmt->bind_param("ii",$thesis_id,$professor_id);
+$stmt->bind_param("i",$thesis_id);
 $stmt->execute();
 $res=$stmt->get_result();
-$grades = null;
-if($row=$res->fetch_assoc()){
-    $grades = $row;
-} else {
-    $grades = [
-        "content_score" => null,
-        "organization_score" => null,
-        "presentation_score" => null
-    ];
+$grades=[];
+while($row=$res->fetch_assoc()){
+    $grades[]=$row;
 }
 $stmt->close();
 $conn->close();
 
 echo json_encode(["success"=>true,"grades"=>$grades]);
-
-$stmt->close();
-$conn->close();
-
-echo json_encode(["success"=>true,"grades"=>$grades]);
+?>
