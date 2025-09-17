@@ -1,150 +1,124 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Αξιολόγηση Διπλωματικών</title>
-  <link rel="stylesheet" href="../../assets/css/styles.css">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: auto;
-      padding: 1rem;
-    }
-    h2 {
-      text-align: center;
-    }
-    select, input, button {
-      width: 100%;
-      padding: 0.5rem;
-      margin: 0.5rem 0;
-    }
-    .grade-inputs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-    .grade-inputs div {
-      flex: 1 1 30%;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Αξιολόγηση Διπλωματικών</title>
+<link rel="stylesheet" href="../../assets/css/styles.css">
+<style>
+  body { font-family: Arial, sans-serif; max-width: 700px; margin: auto; padding: 1rem; }
+  h2 { text-align: center; }
+  select, input, button { width: 100%; padding: 0.5rem; margin: 0.5rem 0; }
+  .grade-section { margin-top: 1rem; border-top: 1px solid #ccc; padding-top: 1rem; }
+</style>
 </head>
 <body>
-  <h2>Αξιολόγηση Διπλωματικών Εργασιών</h2>
+<h2>Αξιολόγηση Διπλωματικών</h2>
 
-  <label for="thesisSelect">Επιλέξτε Διπλωματική:</label>
-  <select id="thesisSelect">
-    <option value="">-- Επιλέξτε Διπλωματική --</option>
-  </select>
+<label for="thesisSelect">Επιλέξτε Διπλωματική:</label>
+<select id="thesisSelect">
+  <option value="">-- Επιλέξτε --</option>
+</select>
 
-  <div id="gradesForm" style="display:none;">
-    <div class="grade-inputs">
-      <div>
-        <label for="contentScore">Περιεχόμενο (0-10):</label>
-        <input type="number" id="contentScore" min="0" max="10" step="0.01">
-      </div>
-      <div>
-        <label for="organizationScore">Οργάνωση (0-10):</label>
-        <input type="number" id="organizationScore" min="0" max="10" step="0.01">
-      </div>
-      <div>
-        <label for="presentationScore">Παρουσίαση (0-10):</label>
-        <input type="number" id="presentationScore" min="0" max="10" step="0.01">
-      </div>
-    </div>
-    <button id="submitGradeBtn">Καταχώρηση Βαθμού</button>
-  </div>
+<div class="grade-section" id="gradeSection" style="display:none;">
+  <h3>Καταχώρηση Βαθμών</h3>
+  <label for="contentScore">Περιεχόμενο (0-10):</label>
+  <input type="number" id="contentScore" min="0" max="10" step="0.01">
+  
+  <label for="organizationScore">Οργάνωση (0-10):</label>
+  <input type="number" id="organizationScore" min="0" max="10" step="0.01">
+  
+  <label for="presentationScore">Παρουσίαση (0-10):</label>
+  <input type="number" id="presentationScore" min="0" max="10" step="0.01">
+  
+  <button id="submitGradeBtn">Καταχώρηση Βαθμού</button>
+</div>
 
-  <button onclick="window.location.href='professor_dashboard.html'">Επιστροφή στο Dashboard</button>
+<button onclick="window.location.href='professor_dashboard.html'">Επιστροφή στο Dashboard</button>
 
-  <script>
-    const thesisSelect = document.getElementById('thesisSelect');
-    const gradesForm = document.getElementById('gradesForm');
-    const contentScoreInput = document.getElementById('contentScore');
-    const organizationScoreInput = document.getElementById('organizationScore');
-    const presentationScoreInput = document.getElementById('presentationScore');
-    const submitGradeBtn = document.getElementById('submitGradeBtn');
+<script>
+const thesisSelect = document.getElementById('thesisSelect');
+const gradeSection = document.getElementById('gradeSection');
+const contentScoreInput = document.getElementById('contentScore');
+const organizationScoreInput = document.getElementById('organizationScore');
+const presentationScoreInput = document.getElementById('presentationScore');
+const submitGradeBtn = document.getElementById('submitGradeBtn');
 
-    // Φόρτωση διπλωματικών που πρέπει να αξιολογήσει ο καθηγητής
-    fetch('../../api/professor/get_theses_to_evaluate.php')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && Array.isArray(data.theses)) {
-          data.theses.forEach(t => {
-            const option = document.createElement('option');
-            option.value = t.id;
-            option.textContent = `${t.title} - ${t.student_name}`;
-            thesisSelect.appendChild(option);
-          });
-        } else {
-          alert("❌ Σφάλμα: " + data.message);
-        }
-      })
-      .catch(err => console.error(err));
-
-    // Όταν επιλέγεται διπλωματική
-    thesisSelect.addEventListener('change', () => {
-      const thesisId = thesisSelect.value;
-      if (!thesisId) {
-        gradesForm.style.display = 'none';
-        return;
-      }
-
-      // Φόρτωση ήδη καταχωρημένων βαθμών (αν υπάρχουν)
-      fetch(`../../api/professor/get_grades_for_thesis.php?thesis_id=${thesisId}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            contentScoreInput.value = data.grades?.content_score ?? '';
-            organizationScoreInput.value = data.grades?.organization_score ?? '';
-            presentationScoreInput.value = data.grades?.presentation_score ?? '';
-            gradesForm.style.display = 'block';
-          } else {
-            alert("❌ Σφάλμα: " + data.message);
-            gradesForm.style.display = 'none';
-          }
-        })
-        .catch(err => console.error(err));
+// Φόρτωση διπλωματικών προς αξιολόγηση
+fetch('../../api/professor/get_theses_to_evaluate.php')
+.then(res => res.json())
+.then(data => {
+  if(data.success){
+    data.theses.forEach(t => {
+      const option = document.createElement('option');
+      option.value = t.id; // id της διπλωματικής
+      option.textContent = t.topic_title + " - " + t.first_name + " " + t.last_name;
+      thesisSelect.appendChild(option);
     });
+  } else {
+    alert("Σφάλμα: " + data.message);
+  }
+});
 
-    // Καταχώρηση βαθμού
-    submitGradeBtn.addEventListener('click', () => {
-      const thesisId = thesisSelect.value;
-      const contentScore = parseFloat(contentScoreInput.value);
-      const organizationScore = parseFloat(organizationScoreInput.value);
-      const presentationScore = parseFloat(presentationScoreInput.value);
+// Όταν επιλεγεί διπλωματική, φορτώνουμε υπάρχοντες βαθμούς
+thesisSelect.addEventListener('change', () => {
+  const thesisId = thesisSelect.value;
+  if(!thesisId){
+    gradeSection.style.display = 'none';
+    return;
+  }
 
-      if (isNaN(contentScore) || isNaN(organizationScore) || isNaN(presentationScore)) {
-        alert("⚠️ Συμπληρώστε όλους τους βαθμούς με έγκυρους αριθμούς");
-        return;
+  fetch(`../../api/professor/get_grades_for_thesis.php?thesis_id=${thesisId}`)
+  .then(res => res.json())
+  .then(data => {
+    if(data.success){
+      gradeSection.style.display = 'block';
+      // Βρίσκουμε αν υπάρχει ήδη βαθμός από τον καθηγητή
+      const myId = parseInt(<?php echo $_SESSION['user_id'] ?? 0; ?>); // Αυτό θα πρέπει να αποφευχθεί, θα το αντικαταστήσουμε με JS
+      const currentProfId = JSON.parse(localStorage.getItem('professor_id')) || 0;
+      const myGrade = data.grades.find(g => g.professor_id == currentProfId);
+      if(myGrade){
+        contentScoreInput.value = myGrade.content_score;
+        organizationScoreInput.value = myGrade.organization_score;
+        presentationScoreInput.value = myGrade.presentation_score;
+      } else {
+        contentScoreInput.value = '';
+        organizationScoreInput.value = '';
+        presentationScoreInput.value = '';
       }
+    } else {
+      alert("Σφάλμα: " + data.message);
+      gradeSection.style.display = 'none';
+    }
+  });
+});
 
-      fetch('../../api/professor/submit_grade.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          thesis_id: thesisId,
-          content_score: contentScore,
-          organization_score: organizationScore,
-          presentation_score: presentationScore
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          alert("✅ Ο βαθμός καταχωρήθηκε επιτυχώς!");
-        } else {
-          alert("❌ " + data.message);
-        }
-      })
-      .catch(err => console.error(err));
-    });
-  </script>
+// Καταχώρηση βαθμού
+submitGradeBtn.addEventListener('click', () => {
+  const thesisId = thesisSelect.value;
+  const contentScore = parseFloat(contentScoreInput.value);
+  const organizationScore = parseFloat(organizationScoreInput.value);
+  const presentationScore = parseFloat(presentationScoreInput.value);
+
+  if(isNaN(contentScore) || isNaN(organizationScore) || isNaN(presentationScore)){
+    alert("Παρακαλώ συμπληρώστε όλους τους βαθμούς!");
+    return;
+  }
+
+  fetch('../../api/professor/submit_grade.php', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ thesis_id: thesisId, content_score: contentScore, organization_score: organizationScore, presentation_score: presentationScore })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.success){
+      alert("Ο βαθμός καταχωρήθηκε επιτυχώς!");
+    } else {
+      alert("Σφάλμα: " + data.message);
+    }
+  });
+});
+</script>
 </body>
 </html>
-
-
-// Επιστροφή στο Dashboard
-document.getElementById('backBtn').addEventListener('click',()=>{ window.location.href='professor_dashboard.html'; });
-</script>
