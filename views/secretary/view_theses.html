@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Προβολή Διπλωματικών</title>
+<style>
+body{font-family:Arial; max-width:900px; margin:auto; padding:1rem;}
+h2{text-align:center;}
+table{width:100%; border-collapse:collapse; margin-top:1rem;}
+th,td{border:1px solid #ddd; padding:8px; text-align:left;}
+th{background:#f4f4f4;}
+button{margin-top:1rem; padding:0.5rem 1rem; border-radius:5px; cursor:pointer;}
+</style>
+</head>
+<body>
+<h2>Προβολή Διπλωματικών (Ενεργές & Υπό Εξέταση)</h2>
+
+<table id="thesesTable">
+  <thead>
+    <tr>
+      <th>Θέμα</th>
+      <th>Περιγραφή</th>
+      <th>Κατάσταση</th>
+      <th>Επιβλέπων</th>
+      <th>Μέλη Τριμελούς</th>
+      <th>Ημέρες από Ανάθεση</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<button onclick="window.location.href='secretary_dashboard.html'">Επιστροφή</button>
+
+<script>
+document.addEventListener("DOMContentLoaded", ()=>{
+    fetch("../../api/secretary/view_theses.php")
+        .then(res=>res.json())
+        .then(data=>{
+            const tbody=document.querySelector("#thesesTable tbody");
+            tbody.innerHTML="";
+            if(data.success){
+                data.theses.forEach(t=>{
+                    let row=document.createElement("tr");
+                    row.innerHTML=`
+                        <td>${t.title}</td>
+                        <td>${t.summary || "-"}</td>
+                        <td>${t.status}</td>
+                        <td>${t.supervisor}</td>
+                        <td>${t.committee_members.join(", ") || "-"}</td>
+                        <td>${t.days_since_assignment}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }else{
+                tbody.innerHTML=`<tr><td colspan="6">${data.message}</td></tr>`;
+            }
+        })
+        .catch(err=>{
+            console.error(err);
+            document.querySelector("#thesesTable tbody").innerHTML=
+              `<tr><td colspan="6">Σφάλμα φόρτωσης</td></tr>`;
+        });
+});
+</script>
+</body>
+</html>
