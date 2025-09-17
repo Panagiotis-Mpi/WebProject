@@ -31,6 +31,9 @@
 
   <button id="assignBtn">Ανάθεση</button>
 
+  <!-- Νέο κουμπί επιστροφής στο Dashboard -->
+  <button id="backBtn" style="background-color:#ccc;">Επιστροφή στο Dashboard</button>
+
   <script>
     // Φόρτωση θεμάτων καθηγητή
     fetch('../../api/professor/get_professor_topics.php')
@@ -73,6 +76,16 @@
           alert("❌ " + data.message);
         }
       });
+    });
+
+    // Επιστροφή στο Dashboard
+    document.getElementById('backBtn').addEventListener('click', () => {
+      window.location.href = "professor_dashboard.html";
+    });
+  </script>
+</body>
+</html>
+
     });
   </script>
 </body>
