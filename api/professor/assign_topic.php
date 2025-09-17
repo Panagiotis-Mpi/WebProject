@@ -46,6 +46,22 @@ $student = $result->fetch_assoc();
 $student_id = $student['id'];
 $stmt->close();
 
+// Έλεγχος αν ο φοιτητής έχει ήδη ενεργή διπλωματική
+$sql = "SELECT id FROM Theses 
+        WHERE student_id = ? 
+        AND status IN ('pending','active','under_review') 
+        LIMIT 1";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $student_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    echo json_encode(["success" => false, "message" => "Ο φοιτητής έχει ήδη ενεργή διπλωματική"]);
+    exit;
+}
+$stmt->close();
+
 // Εισαγωγή στη Theses
 $sql = "INSERT INTO Theses (topic_id, student_id, supervisor_id, status, assignment_date) 
         VALUES (?, ?, ?, 'active', CURDATE())";
