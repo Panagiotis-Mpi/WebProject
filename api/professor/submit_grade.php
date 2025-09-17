@@ -11,9 +11,9 @@ if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'professor'){
 
 $data = json_decode(file_get_contents("php://input"), true);
 $thesis_id = $data['thesis_id'] ?? null;
-$content_score = isset($data['content_score']) ? floatval($data['content_score']) : null;
-$organization_score = isset($data['organization_score']) ? floatval($data['organization_score']) : null;
-$presentation_score = isset($data['presentation_score']) ? floatval($data['presentation_score']) : null;
+$content_score = $data['content_score'] ?? null;
+$organization_score = $data['organization_score'] ?? null;
+$presentation_score = $data['presentation_score'] ?? null;
 $professor_id = $_SESSION['user_id'];
 
 if(!$thesis_id || $content_score===null || $organization_score===null || $presentation_score===null){
@@ -21,7 +21,7 @@ if(!$thesis_id || $content_score===null || $organization_score===null || $presen
     exit;
 }
 
-// Έλεγχος αν ο καθηγητής συμμετέχει στη ΔΕ
+// Έλεγχος αν ο καθηγητής συμμετέχει στη ΔΕ (ως επιβλέπων ή μέλος τριμελούς)
 $sql_check="SELECT 1 FROM Theses t
 LEFT JOIN CommitteeMembers cm ON cm.thesis_id=t.id AND cm.professor_id=? 
 WHERE t.id=? AND (t.supervisor_id=? OR cm.id IS NOT NULL)";
@@ -35,22 +35,15 @@ if($res->num_rows==0){
 }
 $stmt->close();
 
-// Καταχώρηση ή ενημέρωση
+// Καταχώρηση ή ενημέρωση βαθμολογίας
 $sql="INSERT INTO Grades (thesis_id, professor_id, content_score, organization_score, presentation_score)
       VALUES (?, ?, ?, ?, ?)
-      ON DUPLICATE KEY UPDATE content_score=?, organization_score=?, presentation_score=?";
+      ON DUPLICATE KEY UPDATE 
+          content_score=VALUES(content_score),
+          organization_score=VALUES(organization_score),
+          presentation_score=VALUES(presentation_score)";
 $stmt=$conn->prepare($sql);
-$stmt->bind_param(
-    "iiiddddd",
-    $thesis_id,
-    $professor_id,
-    $content_score,
-    $organization_score,
-    $presentation_score,
-    $content_score,
-    $organization_score,
-    $presentation_score
-);
+$stmt->bind_param("iiidd",$thesis_id,$professor_id,$content_score,$organization_score,$presentation_score);
 
 if($stmt->execute()){
     echo json_encode(["success"=>true,"message"=>"Ο βαθμός καταχωρήθηκε επιτυχώς"]);
