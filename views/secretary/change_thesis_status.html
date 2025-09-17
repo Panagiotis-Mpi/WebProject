@@ -5,78 +5,132 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Αλλαγή Κατάστασης Διπλωματικής</title>
 <style>
-body { font-family: Arial; max-width: 600px; margin: auto; padding: 1rem; }
-select, input, button { margin-top: 1rem; width: 100%; padding: 0.5rem; }
+body { font-family: Arial; max-width: 800px; margin: auto; padding: 1rem; }
+h2 { text-align: center; }
+label { display: block; margin-top: 1rem; }
+input, select, textarea, button { width: 100%; padding: 0.5rem; margin-top: 0.5rem; }
 #message { margin-top: 1rem; font-weight: bold; }
+.hidden { display: none; }
 </style>
 </head>
 <body>
+
 <h2>Αλλαγή Κατάστασης Διπλωματικής</h2>
 
-<label>Επιλέξτε Διπλωματική:</label>
-<select id="thesisSelect"></select>
+<label>Επιλογή Διπλωματικής:</label>
+<select id="thesisSelect">
+    <option value="">-- Επιλέξτε ΔΕ --</option>
+</select>
 
-<div id="actions"></div>
+<div id="details" class="hidden">
+    <label>Τρέχουσα Κατάσταση:</label>
+    <input type="text" id="currentStatus" readonly>
+
+    <div id="activeFields" class="hidden">
+        <label>Αριθμός & Έτος ΓΣ (για ανάθεση/ακύρωση):</label>
+        <input type="text" id="gsNumber">
+
+        <label>Λόγος Ακύρωσης:</label>
+        <textarea id="cancelReason"></textarea>
+
+        <button onclick="updateThesis('active')">Καταχώρηση Αλλαγών / Ακύρωση</button>
+    </div>
+
+    <div id="underReviewFields" class="hidden">
+        <label>Σύνδεσμος Νημερτή (αν έχει ανέβει):</label>
+        <input type="text" id="nimertiLink">
+
+        <label>Βαθμός (αν έχει καταχωρηθεί):</label>
+        <input type="number" id="grade" min="0" max="10" step="0.01">
+
+        <button onclick="updateThesis('under_review')">Ολοκλήρωση ΔΕ</button>
+    </div>
+</div>
 
 <div id="message"></div>
 
-<button onclick="window.location.href='secretary_dashboard.html'">Επιστροφή στο Dashboard</button>
-
 <script>
-async function loadTheses(){
-    const res = await fetch('../../api/secretary/get_active_underreview_theses.php');
-    const data = await res.json();
-    const select = document.getElementById('thesisSelect');
-    select.innerHTML = '';
-    data.theses.forEach(thesis => {
-        const option = document.createElement('option');
-        option.value = thesis.id;
-        option.textContent = thesis.title + " (" + thesis.status + ")";
-        select.appendChild(option);
-    });
-    showActions();
-}
+const thesisSelect = document.getElementById('thesisSelect');
+const detailsDiv = document.getElementById('details');
+const activeFields = document.getElementById('activeFields');
+const underReviewFields = document.getElementById('underReviewFields');
+const currentStatusInput = document.getElementById('currentStatus');
 
-function showActions(){
-    const thesisId = document.getElementById('thesisSelect').value;
-    const thesis = thesisData.find(t => t.id == thesisId);
-    const actionsDiv = document.getElementById('actions');
-    actionsDiv.innerHTML = '';
+let thesesData = [];
 
-    if(thesis.status === 'active'){
-        actionsDiv.innerHTML = `
-            <input type="text" id="gs_protocol" placeholder="Αριθμός Πρακτικού ΓΣ">
-            <input type="text" id="cancel_reason" placeholder="Λόγος Ακύρωσης (προαιρετικό)">
-            <button onclick="changeStatus('under_review')">Καταχώρηση Πρακτικού</button>
-            <button onclick="changeStatus('cancelled')">Ακύρωση ΔΕ</button>
-        `;
-    } else if(thesis.status === 'under_review'){
-        actionsDiv.innerHTML = `
-            <button onclick="changeStatus('completed')">Ολοκλήρωση ΔΕ (Περατωμένη)</button>
-        `;
+fetch('../../api/secretary/get_active_underreview_theses.php')
+.then(res => res.json())
+.then(data => {
+    if(data.success){
+        thesesData = data.theses;
+        data.theses.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t.id;
+            opt.textContent = t.title + " [" + t.status + "]";
+            thesisSelect.appendChild(opt);
+        });
+    } else {
+        alert("Σφάλμα φόρτωσης Διπλωματικών.");
     }
-}
+});
 
-async function changeStatus(newStatus){
-    const thesisId = document.getElementById('thesisSelect').value;
-    const gs_protocol = document.getElementById('gs_protocol') ? document.getElementById('gs_protocol').value : null;
-    const cancel_reason = document.getElementById('cancel_reason') ? document.getElementById('cancel_reason').value : null;
+thesisSelect.addEventListener('change', function(){
+    const id = this.value;
+    if(!id){
+        detailsDiv.classList.add('hidden');
+        return;
+    }
 
-    const res = await fetch('../../api/secretary/change_thesis_status.php',{
-        method:'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({thesis_id: thesisId, status: newStatus, gs_protocol, cancel_reason})
+    const thesis = thesesData.find(t => t.id == id);
+    currentStatusInput.value = thesis.status;
+    detailsDiv.classList.remove('hidden');
+
+    // Εμφάνιση ανάλογων πεδίων
+    if(thesis.status === 'active'){
+        activeFields.classList.remove('hidden');
+        underReviewFields.classList.add('hidden');
+    } else if(thesis.status === 'under_review'){
+        underReviewFields.classList.remove('hidden');
+        activeFields.classList.add('hidden');
+    }
+});
+
+function updateThesis(status){
+    const id = thesisSelect.value;
+    const gsNumber = document.getElementById('gsNumber').value;
+    const cancelReason = document.getElementById('cancelReason').value;
+    const nimertiLink = document.getElementById('nimertiLink').value;
+    const grade = document.getElementById('grade').value;
+
+    const payload = { thesis_id: id, status };
+
+    if(status === 'active'){
+        payload.gs_number = gsNumber;
+        payload.cancel_reason = cancelReason;
+    } else if(status === 'under_review'){
+        payload.nimerti_link = nimertiLink;
+        payload.grade = grade;
+    }
+
+    fetch('../../api/secretary/update_thesis_status.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        const msgDiv = document.getElementById('message');
+        msgDiv.textContent = data.message;
+        msgDiv.style.color = data.success ? "green" : "red";
+        if(data.success) location.reload(); // ανανέωση λίστας ΔΕ
+    })
+    .catch(() => {
+        const msgDiv = document.getElementById('message');
+        msgDiv.textContent = "Σφάλμα επικοινωνίας με τον server.";
+        msgDiv.style.color = "red";
     });
-    const data = await res.json();
-    const msg = document.getElementById('message');
-    msg.textContent = data.message;
-    msg.style.color = data.success ? 'green' : 'red';
-    loadTheses();
 }
-
-// Προφόρτωση δεδομένων
-let thesisData = [];
-loadTheses();
 </script>
+
 </body>
 </html>
