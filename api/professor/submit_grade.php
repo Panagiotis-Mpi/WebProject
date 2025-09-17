@@ -21,6 +21,14 @@ if(!$thesis_id || $content_score===null || $organization_score===null || $presen
     exit;
 }
 
+// Έλεγχος αν οι βαθμοί είναι μεταξύ 0 και 10
+if($content_score < 0 || $content_score > 10 ||
+   $organization_score < 0 || $organization_score > 10 ||
+   $presentation_score < 0 || $presentation_score > 10){
+    echo json_encode(["success"=>false,"message"=>"Οι βαθμοί πρέπει να είναι μεταξύ 0 και 10"]);
+    exit;
+}
+
 // Έλεγχος αν ο καθηγητής συμμετέχει στη ΔΕ (ως επιβλέπων ή μέλος τριμελούς)
 $sql_check="SELECT 1 FROM Theses t
 LEFT JOIN CommitteeMembers cm ON cm.thesis_id=t.id AND cm.professor_id=? 
