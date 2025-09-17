@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Προσκλήσεις Τριμελούς</title>
+<style>
+body { font-family: Arial, sans-serif; max-width: 700px; margin: auto; padding: 1rem; }
+h2 { text-align: center; }
+table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+button { padding: 0.3rem 0.5rem; margin-right: 0.3rem; cursor: pointer; }
+#backBtn { margin-top: 1rem; width: 100%; }
+</style>
+</head>
+<body>
+<h2>Προσκλήσεις Τριμελούς Επιτροπής</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Φοιτητής</th>
+      <th>Θέμα</th>
+      <th>Ενέργεια</th>
+    </tr>
+  </thead>
+  <tbody id="invitationsTable"></tbody>
+</table>
+
+<button id="backBtn">Επιστροφή στο Dashboard</button>
+
+<script>
+function loadInvitations() {
+  fetch('../../api/professor/get_committee_invitations.php')
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.getElementById('invitationsTable');
+      tbody.innerHTML = '';
+      if (data.success) {
+        data.invitations.forEach(inv => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${inv.first_name} ${inv.last_name}</td>
+            <td>${inv.topic_title}</td>
+            <td>
+              <button onclick="respond(${inv.invitation_id}, 'accept')">✅ Αποδοχή</button>
+              <button onclick="respond(${inv.invitation_id}, 'reject')">❌ Απόρριψη</button>
+            </td>`;
+          tbody.appendChild(tr);
+        });
+      } else {
+        tbody.innerHTML = `<tr><td colspan="3">Σφάλμα: ${data.message}</td></tr>`;
+      }
+    });
+}
+
+function respond(invitation_id, action) {
+  fetch('../../api/professor/respond_committee_invitation.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ invitation_id, action })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.message);
+    loadInvitations();
+  });
+}
+
+// Φόρτωση κατά την έναρξη
+loadInvitations();
+
+// Επιστροφή στο Dashboard
+document.getElementById('backBtn').addEventListener('click', () => {
+  window.location.href = 'professor_dashboard.html';
+});
+</script>
+</body>
+</html>
