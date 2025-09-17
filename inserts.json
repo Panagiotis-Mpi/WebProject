@@ -1,0 +1,17 @@
+{
+  "students": [
+    {"email":"student11@university.gr","password":"abcd","first_name":"Dimitris","last_name":"Alexiou","am":"AM1011","phone":"6973330011"},
+    {"email":"student12@university.gr","password":"abcd","first_name":"Katerina","last_name":"Vasilaki","am":"AM1012","phone":"6973330012"},
+    {"email":"student13@university.gr","password":"abcd","first_name":"Antonis","last_name":"Nikiforou","am":"AM1013","phone":"6973330013"},
+    {"email":"student14@university.gr","password":"abcd","first_name":"Sophia","last_name":"Mavridou","am":"AM1014","phone":"6973330014"},
+    {"email":"student15@university.gr","password":"abcd","first_name":"Ioannis","last_name":"Petrou","am":"AM1015","phone":"6973330015"}
+  ],
+  "professors": [
+    {"email":"prof6@university.gr","password":"abcd","first_name":"Eleni","last_name":"Markou","phone":"6974440006"},
+    {"email":"prof7@university.gr","password":"abcd","first_name":"Christos","last_name":"Papageorgiou","phone":"6974440007"},
+    {"email":"prof8@university.gr","password":"abcd","first_name":"Maria","last_name":"Kostopoulou","phone":"6974440008"}
+  ],
+  "secretaries": [
+    {"email":"secretary2@university.gr","password":"abcd","first_name":"Anna","last_name":"Admin"}
+  ]
+}
