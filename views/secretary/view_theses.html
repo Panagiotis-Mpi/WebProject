@@ -5,63 +5,59 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Προβολή Διπλωματικών</title>
 <style>
-body{font-family:Arial; max-width:900px; margin:auto; padding:1rem;}
+body{font-family:Arial;max-width:800px;margin:auto;padding:1rem;}
 h2{text-align:center;}
-table{width:100%; border-collapse:collapse; margin-top:1rem;}
-th,td{border:1px solid #ddd; padding:8px; text-align:left;}
-th{background:#f4f4f4;}
-button{margin-top:1rem; padding:0.5rem 1rem; border-radius:5px; cursor:pointer;}
+ul{list-style:none;padding:0;}
+li{margin:0.5rem 0;padding:0.5rem;border:1px solid #ccc;border-radius:5px;cursor:pointer;}
+.details{margin-top:1rem;padding:1rem;border:1px solid #aaa;border-radius:5px;background:#f9f9f9;}
+button{margin-top:1rem;padding:0.5rem 1rem;cursor:pointer;border-radius:5px;}
 </style>
 </head>
 <body>
-<h2>Προβολή Διπλωματικών (Ενεργές & Υπό Εξέταση)</h2>
+<h2>Προβολή Διπλωματικών</h2>
+<ul id="thesesList"></ul>
 
-<table id="thesesTable">
-  <thead>
-    <tr>
-      <th>Θέμα</th>
-      <th>Περιγραφή</th>
-      <th>Κατάσταση</th>
-      <th>Επιβλέπων</th>
-      <th>Μέλη Τριμελούς</th>
-      <th>Ημέρες από Ανάθεση</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+<div id="details" class="details" style="display:none;"></div>
 
-<button onclick="window.location.href='secretary_dashboard.html'">Επιστροφή</button>
+<button onclick="window.location.href='secretary_dashboard.html'">Επιστροφή στο Dashboard</button>
 
 <script>
 document.addEventListener("DOMContentLoaded", ()=>{
     fetch("../../api/secretary/view_theses.php")
-        .then(res=>res.json())
-        .then(data=>{
-            const tbody=document.querySelector("#thesesTable tbody");
-            tbody.innerHTML="";
-            if(data.success){
-                data.theses.forEach(t=>{
-                    let row=document.createElement("tr");
-                    row.innerHTML=`
-                        <td>${t.title}</td>
-                        <td>${t.summary || "-"}</td>
-                        <td>${t.status}</td>
-                        <td>${t.supervisor}</td>
-                        <td>${t.committee_members.join(", ") || "-"}</td>
-                        <td>${t.days_since_assignment}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            }else{
-                tbody.innerHTML=`<tr><td colspan="6">${data.message}</td></tr>`;
-            }
-        })
-        .catch(err=>{
-            console.error(err);
-            document.querySelector("#thesesTable tbody").innerHTML=
-              `<tr><td colspan="6">Σφάλμα φόρτωσης</td></tr>`;
-        });
+    .then(res=>res.json())
+    .then(data=>{
+        if(data.success){
+            const list=document.getElementById("thesesList");
+            data.data.forEach(thesis=>{
+                const li=document.createElement("li");
+                li.textContent = thesis.title + " ("+thesis.status+")";
+                li.onclick = ()=>showDetails(thesis);
+                list.appendChild(li);
+            });
+        }else{
+            alert("Σφάλμα: " + data.message);
+        }
+    });
 });
+
+function showDetails(thesis){
+    const div=document.getElementById("details");
+    div.style.display="block";
+    div.innerHTML = `
+        <h3>${thesis.title}</h3>
+        <p><b>Περιγραφή:</b> ${thesis.summary}</p>
+        <p><b>Κατάσταση:</b> ${thesis.status}</p>
+        <p><b>Ημέρες από ανάθεση:</b> ${thesis.days_passed !== null ? thesis.days_passed + " ημέρες" : "Δεν έχει ανατεθεί ακόμα"}</p>
+        <h4>Τριμελής Επιτροπή:</h4>
+        <ul>
+            ${thesis.committee.length > 0 ? 
+                thesis.committee.map(m=>`<li>${m.first_name} ${m.last_name} (${m.role})</li>`).join("") 
+                : "<li>Δεν έχουν οριστεί μέλη</li>"
+            }
+        </ul>
+    `;
+}
 </script>
 </body>
 </html>
+
