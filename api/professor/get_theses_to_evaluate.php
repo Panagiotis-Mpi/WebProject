@@ -35,8 +35,3 @@ $conn->close();
 
 echo json_encode(["success"=>true,"theses"=>$theses]);
 ?>
-
-$stmt->close();
-$conn->close();
-
-echo json_encode(["success"=>true,"theses"=>$theses]);
