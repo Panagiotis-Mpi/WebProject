@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Στατιστικά Διπλωματικών</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body { font-family: Arial, sans-serif; max-width: 700px; margin: auto; padding: 1rem; }
+h2 { text-align: center; }
+canvas { margin-top: 2rem; }
+#backBtn { margin-top: 1rem; width: 100%; padding: 0.5rem; }
+</style>
+</head>
+<body>
+<h2>Στατιστικά Διπλωματικών</h2>
+
+<canvas id="durationChart" height="150"></canvas>
+<canvas id="gradeChart" height="150"></canvas>
+<canvas id="countChart" height="150"></canvas>
+
+<button id="backBtn">Επιστροφή στο Dashboard</button>
+
+<script>
+fetch('../../api/professor/get_professor_statistics.php')
+  .then(res => res.json())
+  .then(data => {
+    if (!data.success) { alert(data.message); return; }
+
+    // Μέσος χρόνος περάτωσης
+    new Chart(document.getElementById('durationChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Μέσος Χρόνος (ημέρες)'],
+        datasets: [{ label: 'Διπλωματικές', data: [data.avg_duration], backgroundColor: 'rgba(54, 162, 235, 0.7)' }]
+      },
+      options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+
+    // Μέσος βαθμός
+    new Chart(document.getElementById('gradeChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Μέσος Βαθμός'],
+        datasets: [{ label: 'Διπλωματικές', data: [data.avg_grade], backgroundColor: 'rgba(75, 192, 192, 0.7)' }]
+      },
+      options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 10 } } }
+    });
+
+    // Συνολικό πλήθος
+    new Chart(document.getElementById('countChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Συνολικές Διπλωματικές'],
+        datasets: [{ label: 'Διπλωματικές', data: [data.total_count], backgroundColor: 'rgba(255, 159, 64, 0.7)' }]
+      },
+      options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+  });
+
+// Επιστροφή στο Dashboard
+document.getElementById('backBtn').addEventListener('click', () => {
+  window.location.href = 'professor_dashboard.html';
+});
+</script>
+</body>
+</html>
