@@ -31,19 +31,29 @@ if($res->num_rows==0){
 }
 $stmt->close();
 
-// Παίρνουμε όλους τους βαθμούς
-$sql="SELECT g.professor_id, u.first_name, u.last_name, g.content_score, g.organization_score, g.presentation_score, g.final_grade
-      FROM Grades g
-      JOIN Users u ON u.id=g.professor_id
-      WHERE g.thesis_id=?";
+// Παίρνουμε τα σκορ του τρέχοντος καθηγητή
+$sql="SELECT content_score, organization_score, presentation_score
+      FROM Grades
+      WHERE thesis_id=? AND professor_id=?";
 $stmt=$conn->prepare($sql);
-$stmt->bind_param("i",$thesis_id);
+$stmt->bind_param("ii",$thesis_id,$professor_id);
 $stmt->execute();
 $res=$stmt->get_result();
-$grades=[];
-while($row=$res->fetch_assoc()){
-    $grades[]=$row;
+$grades = null;
+if($row=$res->fetch_assoc()){
+    $grades = $row;
+} else {
+    $grades = [
+        "content_score" => null,
+        "organization_score" => null,
+        "presentation_score" => null
+    ];
 }
+$stmt->close();
+$conn->close();
+
+echo json_encode(["success"=>true,"grades"=>$grades]);
+
 $stmt->close();
 $conn->close();
 
