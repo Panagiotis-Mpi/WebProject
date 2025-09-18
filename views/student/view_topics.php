@@ -37,78 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['topic_id'])) {
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="el">
-<head>
-    <meta charset="UTF-8">
-    <title>Λίστα Θεμάτων</title>
-    <style>
-        .taken { color: red; font-weight: bold; }
-        .free { color: green; font-weight: bold; }
-        form { display:inline; }
-    </style>
-</head>
-<body>
-    <h1>Λίστα Θεμάτων</h1>
-
-    <?php if ($error): ?><p style="color:red;"><?= $error ?></p><?php endif; ?>
-    <?php if ($success): ?><p style="color:green;"><?= $success ?></p><?php endif; ?>
-
-    <div id="topics-container">
-        </div>
-
-    <p><a href="dashboard.php">← Επιστροφή στο Dashboard</a></p>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const topicsContainer = document.getElementById('topics-container');
-
-            fetch('../api/get_topics.php')
-                .then(response => response.json())
-                .then(topics => {
-                    if (topics.error) {
-                        topicsContainer.innerHTML = `<p style="color:red;">Σφάλμα φόρτωσης θεμάτων: ${topics.error}</p>`;
-                        return;
-                    }
-                    if (topics.length === 0) {
-                        topicsContainer.innerHTML = "<p>Δεν υπάρχουν διαθέσιμα θέματα αυτή τη στιγμή.</p>";
-                        return;
-                    }
-                    
-                    let html = '<ul>';
-                    topics.forEach(topic => {
-                        const statusClass = topic.is_taken > 0 ? 'taken' : 'free';
-                        const statusText = topic.is_taken > 0 ? 'Δεσμευμένο' : 'Ελεύθερο';
-                        const actionButton = topic.is_taken > 0 ? '' : `
-                            <form method="post">
-                                <input type="hidden" name="topic_id" value="${topic.id}">
-                                <button type="submit">Αίτηση Ανάθεσης</button>
-                            </form>
-                        `;
-
-                        const pdfLink = topic.pdf_path ? `<a href="${topic.pdf_path}" target="_blank">📄 Αναλυτική Περιγραφή</a>` : '';
-
-                        html += `
-                            <li>
-                                <strong>${topic.title}</strong><br>
-                                ${topic.summary.replace(/\n/g, '<br>')}<br>
-                                Επιβλέπων: ${topic.first_name} ${topic.last_name}<br>
-                                Κατάσταση: <span class="${statusClass}">${statusText}</span>
-                                ${actionButton}
-                                <br>
-                                ${pdfLink}
-                            </li>
-                            <hr>
-                        `;
-                    });
-                    html += '</ul>';
-                    topicsContainer.innerHTML = html;
-                })
-                .catch(error => {
-                    topicsContainer.innerHTML = `<p style="color:red;">Σφάλμα κατά την ανάκτηση των θεμάτων. Παρακαλώ δοκιμάστε ξανά.</p>`;
-                    console.error('Fetch error:', error);
-                });
         });
     </script>
 </body>
+
 </html>
