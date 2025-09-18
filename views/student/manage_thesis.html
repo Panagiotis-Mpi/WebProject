@@ -1,36 +1,85 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-    <meta charset="UTF-8">
-    <title>Η Διπλωματική Μου</title>
-    <link rel="stylesheet" href="../styles.css">
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { margin-bottom: 15px; }
-        .note { border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 4px; background: #f9f9f9; }
-        .note small { color: #666; display: block; margin-top: 5px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Διαχείριση Διπλωματικής</title>
+<style>
+body{font-family:Arial; max-width:800px; margin:auto; padding:1rem;}
+h2{text-align:center;}
+table{width:100%; border-collapse:collapse; margin-top:1rem;}
+th,td{border:1px solid #ccc; padding:0.5rem; text-align:left;}
+button{margin-top:0.5rem; padding:0.5rem;}
+input[type=text]{width:100%;}
+</style>
 </head>
 <body>
-    <h1>Η Διπλωματική Μου</h1>
+<h2>Διαχείριση Διπλωματικής</h2>
 
-    <h3>Βασικές Πληροφορίες</h3>
-    <p><strong>Θέμα:</strong> <?= htmlspecialchars($thesis['title']) ?></p>
-    <p><strong>Επιβλέπων:</strong> <?= htmlspecialchars($thesis['sup_first'].' '.$thesis['sup_last']) ?></p>
-    <p><strong>Κατάσταση:</strong> <?= htmlspecialchars($thesis['status']) ?></p>
+<div id="thesisInfo"></div>
 
-    <h3>Σημειώσεις Καθηγητών</h3>
-    <?php if (empty($notes)): ?>
-        <p>Δεν υπάρχουν σημειώσεις για τη διπλωματική σας.</p>
-    <?php else: ?>
-        <?php foreach ($notes as $note): ?>
-            <div class="note">
-                <p><?= nl2br(htmlspecialchars($note['content'])) ?></p>
-                <small>Από: <?= htmlspecialchars($note['first_name'].' '.$note['last_name']) ?></small>
-            </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
+<script>
+function fetchThesis(){
+    fetch('../../api/student/get_student_thesis.php')
+    .then(res=>res.json())
+    .then(data=>{
+        if(!data.success){ document.getElementById('thesisInfo').innerText=data.message; return; }
+        const t = data.thesis;
+        let html = `
+        <table>
+        <tr><th>Θέμα</th><td>${t.title}</td></tr>
+        <tr><th>Περιγραφή</th><td>${t.summary}</td></tr>
+        <tr><th>PDF</th><td><a href="${t.pdf_path}" target="_blank">Άνοιγμα PDF</a></td></tr>
+        <tr><th>Κατάσταση</th><td>${t.status}</td></tr>
+        <tr><th>Ημερομηνία Ανάθεσης</th><td>${t.assignment_date}</td></tr>
+        <tr><th>Επιβλέπων</th><td>${t.supervisor_first} ${t.supervisor_last}</td></tr>
+        <tr><th>Μέλη Επιτροπής</th><td>${t.committee_members.map(m=>m.first_name+" "+m.last_name+" ("+m.status+")").join("<br>")}</td></tr>
+        </table>
+        `;
 
-    <p><a href="dashboard.php">← Επιστροφή στο Dashboard</a></p>
+        if(t.status==='under_review'){
+            html += `<h3>Καταχώρηση Συνδέσμου Νημερτής</h3>
+            <input type="text" id="library_link" placeholder="https://...">
+            <button onclick="saveLibraryLink(${t.thesis_id})">Αποθήκευση</button>
+            <h3>Ανέβασμα Προσχεδίου</h3>
+            <input type="file" id="review_doc">
+            <button onclick="uploadReview(${t.thesis_id})">Ανέβασμα</button>
+            `;
+        }
+
+        document.getElementById('thesisInfo').innerHTML = html;
+    });
+}
+
+function saveLibraryLink(thesis_id){
+    const link = document.getElementById('library_link').value;
+    fetch('../../api/student/update_library_link.php',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({thesis_id, library_link: link})
+    }).then(res=>res.json()).then(data=>{
+        alert(data.message);
+        fetchThesis();
+    });
+}
+
+function uploadReview(thesis_id){
+    const fileInput = document.getElementById('review_doc');
+    if(fileInput.files.length===0){ alert("Επιλέξτε αρχείο"); return; }
+    const formData = new FormData();
+    formData.append('thesis_id', thesis_id);
+    formData.append('review_doc', fileInput.files[0]);
+
+    fetch('../../api/student/upload_review_doc.php',{
+        method:'POST',
+        body: formData
+    }).then(res=>res.json()).then(data=>{
+        alert(data.message);
+        fetchThesis();
+    });
+}
+
+fetchThesis();
+</script>
 </body>
 </html>
