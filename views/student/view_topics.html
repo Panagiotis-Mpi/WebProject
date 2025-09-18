@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Διαθέσιμα Θέματα</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        ul { list-style-type: none; padding: 0; }
+        li { margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; border-radius: 5px; }
+        .taken { color: red; font-weight: bold; }
+        .available { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Διαθέσιμα Θέματα Διπλωματικών</h1>
+    
+    <?php if ($error): ?><p style="color:red;"><?= htmlspecialchars($error) ?></p><?php endif; ?>
+    <?php if ($success): ?><p style="color:green;"><?= htmlspecialchars($success) ?></p><?php endif; ?>
+
+    <p id="message"></p>
+    <div id="topics-container">Φόρτωση θεμάτων...</div>
+    <p><a href="dashboard.php">← Επιστροφή</a></p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const topicsContainer = document.getElementById('topics-container');
+            const messageElement = document.getElementById('message');
+
+            fetch('../api/get_topics.php')
+                .then(response => response.json())
+                .then(topics => {
+                    if (topics.error) {
+                        topicsContainer.innerHTML = `<p style="color:red;">Σφάλμα API: ${topics.error}</p>`;
+                        return;
+                    }
+                    if (topics.length === 0) {
+                        topicsContainer.innerHTML = `<p>Δεν υπάρχουν διαθέσιμα θέματα αυτή τη στιγμή.</p>`;
+                        return;
+                    }
+
+                    let hasThesis = <?= json_encode($has_thesis); ?>;
+                    if (hasThesis) {
+                        messageElement.innerHTML = `<p style="color:red;">Έχετε ήδη ενεργή ή υπό ανάθεση διπλωματική. Δεν μπορείτε να επιλέξετε νέο θέμα.</p>`;
+                    }
+
+                    let html = '<ul>';
+                    topics.forEach(topic => {
+                        const statusClass = topic.is_taken > 0 ? 'taken' : 'available';
+                        const statusText = topic.is_taken > 0 ? 'Δεσμευμένο' : 'Διαθέσιμο';
+                        
+                        const actionButton = (topic.is_taken > 0 || hasThesis) ? '' : `
+                            <form method="post">
+                                <input type="hidden" name="topic_id" value="${topic.id}">
+                                <button type="submit">Αίτηση Ανάθεσης</button>
+                            </form>
+                        `;
+
+                        const pdfLink = topic.pdf_path ? `<a href="${topic.pdf_path}" target="_blank">📄 Αναλυτική Περιγραφή</a>` : '';
+
+                        html += `
+                            <li>
+                                <strong>${topic.title}</strong><br>
+                                ${topic.summary.replace(/\\n/g, '<br>')}<br>
+                                Επιβλέπων: ${topic.first_name} ${topic.last_name}<br>
+                                Κατάσταση: <span class="${statusClass}">${statusText}</span>
+                                ${actionButton}
+                                <br>
+                                ${pdfLink}
+                            </li>
+                            <hr>
+                        `;
+                    });
+                    html += '</ul>';
+                    topicsContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    topicsContainer.innerHTML = `<p style="color:red;">Σφάλμα κατά την ανάκτηση των θεμάτων. Παρακαλώ δοκιμάστε ξανά.</p>`;
+                    console.error('Fetch error:', error);
+                });
+        });
+    </script>
+</body>
+</html>
