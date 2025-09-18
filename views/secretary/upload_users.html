@@ -1,0 +1,32 @@
+<h1>Μαζικό Ανέβασμα Χρηστών</h1>
+
+<p>Μπορείτε να ανεβάσετε ένα αρχείο JSON με τα στοιχεία των χρηστών.</p>
+<pre>
+    [
+        {
+            "email": "student1@uni.gr",
+            "password": "hashed_password",
+            "first_name": "John",
+            "last_name": "Doe",
+            "role": "student",
+            "am": "123456"
+        },
+        {
+            "email": "prof1@uni.gr",
+            "password": "hashed_password",
+            "first_name": "Jane",
+            "last_name": "Smith",
+            "role": "professor"
+        }
+    ]
+</pre>
+
+<?php if ($message): ?><p style="color:green;"><?= $message ?></p><?php endif; ?>
+
+<form method="post" enctype="multipart/form-data">
+    <label for="json_file">Επιλέξτε αρχείο JSON:</label>
+    <input type="file" name="json_file" id="json_file" accept=".json" required>
+    <button type="submit">Ανέβασμα</button>
+</form>
+
+<p><a href="dashboard.php">← Επιστροφή στο Dashboard</a></p>
