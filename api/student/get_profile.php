@@ -1,32 +1,23 @@
-
 <?php
-// api/get_profile.php
 session_start();
-require '../db.php';
+require_once("../../config/db.php");
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
-    header("Content-Type: application/json");
-    echo json_encode(['error' => 'Unauthorized access.']);
-    exit();
+// Έλεγχος αν είναι φοιτητής
+if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student'){
+    echo json_encode(["success" => false, "message" => "Μη εξουσιοδοτημένη πρόσβαση"]);
+    exit;
 }
 
-$student_id = $_SESSION['user_id'];
+$user_id = $_SESSION['user_id'];
 
-try {
-    $stmt = $pdo->prepare("SELECT first_name, last_name, email, contact_info FROM Users WHERE id = ?");
-    $stmt->execute([$student_id]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt = $conn->prepare("SELECT email, first_name, last_name, am, phone FROM Users WHERE id=? AND role='student'");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
 
-    if ($user) {
-        header("Content-Type: application/json");
-        echo json_encode($user);
-    } else {
-        header("Content-Type: application/json");
-        echo json_encode(['error' => 'User not found.']);
-    }
-
-} catch (PDOException $e) {
-    header("Content-Type: application/json");
-    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+if($user){
+    echo json_encode(["success" => true, "user" => $user]);
+} else {
+    echo json_encode(["success" => false, "message" => "Δεν βρέθηκαν στοιχεία"]);
 }
-?>
