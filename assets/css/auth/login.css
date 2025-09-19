@@ -1,0 +1,105 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+/* Header */
+header {
+    position: relative;
+    background: #004080;
+    color: white;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+header .logo {
+    position: absolute;
+    left: 1rem;
+    height: 60px;
+}
+
+/* Footer */
+footer {
+    background: #004080;
+    color: white;
+    text-align: center;
+    padding: 0.7rem;
+}
+
+/* Main */
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Login box */
+.login-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}
+
+.login-container h2 {
+    color: #004080;
+    margin-bottom: 1rem;
+}
+
+/* Inputs */
+.login-container input {
+    width: 100%;
+    padding: 0.7rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+/* Button */
+.login-btn {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #0066cc;
+    color: white;
+    transition: background 0.3s, transform 0.2s;
+}
+.login-btn:hover {
+    background: #004080;
+    transform: translateY(-2px);
+}
+
+/* Message */
+#message {
+    margin-top: 1rem;
+    font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem 0.5rem;
+    }
+    header .logo {
+        position: static;
+        margin-bottom: 0.5rem;
+        height: 50px;
+    }
+}
