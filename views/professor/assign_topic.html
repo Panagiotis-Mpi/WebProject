@@ -1,86 +1,92 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ανάθεση Θέματος</title>
-  <link rel="stylesheet" href="../../assets/css/styles.css">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 700px;
-      margin: auto;
-      padding: 1rem;
-    }
-    h2 { text-align: center; }
-    select, input, button {
-      width: 100%;
-      padding: 0.5rem;
-      margin: 0.5rem 0;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ανάθεση Θέματος</title>
+<link rel="stylesheet" href="../../assets/css/professor/assign_topic.css">
 </head>
 <body>
-  <h2>Αρχική Ανάθεση Θέματος</h2>
 
-  <label for="topicSelect">Επιλέξτε Θέμα:</label>
-  <select id="topicSelect"></select>
+<header>
+    <img src="../../assets/img/ceid.png" alt="CEID Logo" class="logo">
+    <h1>Αρχική Ανάθεση Θέματος</h1>
+    <button class="logout-btn" onclick="logout()">Αποσύνδεση</button>
+</header>
 
-  <label for="studentAm">Εισάγετε Αριθμό Μητρώου Φοιτητή (ΑΜ):</label>
-  <input type="text" id="studentAm" placeholder="π.χ. 123456">
+<main>
+    <div class="container">
+        <label for="topicSelect">Επιλέξτε Θέμα:</label>
+        <select id="topicSelect"></select>
 
-  <button id="assignBtn">Ανάθεση</button>
+        <label for="studentAm">Εισάγετε Αριθμό Μητρώου Φοιτητή (ΑΜ):</label>
+        <input type="text" id="studentAm" placeholder="π.χ. 123456">
 
-  <button id="backBtn" style="background-color:#ccc;">Επιστροφή</button>
+        <button id="assignBtn">Ανάθεση</button>
 
-  <script>
-    // Φόρτωση θεμάτων καθηγητή
-    fetch('../../api/professor/get_professor_topics.php')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          const topicSelect = document.getElementById('topicSelect');
-          data.topics.forEach(t => {
+        <!-- Κουμπί πίσω -->
+        <button class="back-btn" id="backBtn">Πίσω</button>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2025 Πανεπιστήμιο Πατρών - Πλατφόρμα Διπλωματικών</p>
+</footer>
+
+<script>
+function logout(){
+    fetch('../../api/auth/logout.php')
+        .then(() => window.location.href = '../auth/login.html');
+}
+
+// Φόρτωση θεμάτων καθηγητή
+fetch('../../api/professor/get_professor_topics.php')
+.then(res => res.json())
+.then(data => {
+    if (data.success) {
+        const topicSelect = document.getElementById('topicSelect');
+        data.topics.forEach(t => {
             const option = document.createElement('option');
             option.value = t.id;
             option.textContent = t.title;
             topicSelect.appendChild(option);
-          });
-        } else {
-          alert("❌ Σφάλμα: " + data.message);
-        }
-      });
+        });
+    } else {
+        alert("❌ Σφάλμα: " + data.message);
+    }
+});
 
-    // Ανάθεση θέματος
-    document.getElementById('assignBtn').addEventListener('click', () => {
-      const topicId = document.getElementById('topicSelect').value;
-      const studentAm = document.getElementById('studentAm').value.trim();
+// Ανάθεση θέματος
+document.getElementById('assignBtn').addEventListener('click', () => {
+    const topicId = document.getElementById('topicSelect').value;
+    const studentAm = document.getElementById('studentAm').value.trim();
 
-      if (!topicId || !studentAm) {
+    if (!topicId || !studentAm) {
         alert("⚠️ Επιλέξτε θέμα και εισάγετε ΑΜ φοιτητή!");
         return;
-      }
+    }
 
-      fetch('../../api/professor/assign_topic.php', {
+    fetch('../../api/professor/assign_topic.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ topic_id: topicId, student_am: studentAm })
-      })
-      .then(res => res.json())
-      .then(data => {
+    })
+    .then(res => res.json())
+    .then(data => {
         if (data.success) {
-          alert("✅ Το θέμα ανατέθηκε με επιτυχία!");
-          window.location.href = "professor_dashboard.html";
+            alert("Το θέμα ανατέθηκε με επιτυχία!");
+            window.location.href = "professor_dashboard.html";
         } else {
-          alert("❌ " + data.message);
+            alert("❌ " + data.message);
         }
-      });
     });
+});
 
-    // Επιστροφή στο Dashboard
-    document.getElementById('backBtn').addEventListener('click', () => {
-      window.location.href = "professor_dashboard.html";
-    });
-  </script>
+// Επιστροφή στο Dashboard
+document.getElementById('backBtn').addEventListener('click', () => {
+    window.location.href = "professor_dashboard.html";
+});
+</script>
+
 </body>
 </html>
