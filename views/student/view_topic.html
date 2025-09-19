@@ -4,20 +4,37 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Προβολή Θέματος</title>
-<style>
-body{font-family:Arial; max-width:700px; margin:auto; padding:1rem;}
-h2{text-align:center;}
-#topicDetails{margin-top:1rem; border:1px solid #ccc; padding:1rem; border-radius:8px;}
-h3{margin-top:1rem;}
-</style>
+<link rel="stylesheet" href="../../assets/css/student/view_topic.css">
 </head>
 <body>
-<h2>Προβολή Θέματος</h2>
-<div id="topicDetails">Φόρτωση...</div>
 
-<button onclick="window.location.href='student_dashboard.html'">Επιστροφή</button>
+<header>
+    <img src="../../assets/img/ceid.png" alt="CEID Logo" class="logo">
+    <h1>Προβολή Θέματος</h1>
+    <button class="logout-btn" onclick="logout()">Αποσύνδεση</button>
+</header>
+
+<main>
+    <div class="container" id="topicDetails">Φόρτωση...</div>
+    <button class="back-btn" onclick="window.location.href='student_dashboard.html'">⬅️ Πίσω</button>
+</main>
+
+<footer>
+    <p>&copy; 2025 Πανεπιστήμιο Πατρών - Πλατφόρμα Διπλωματικών</p>
+</footer>
 
 <script>
+function logout(){
+    fetch('../../api/auth/logout.php')
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) window.location.href='../auth/login.html';
+            else alert('Σφάλμα κατά την αποσύνδεση');
+        })
+        .catch(() => alert('Σφάλμα επικοινωνίας με τον server'));
+}
+
+// Φόρτωση δεδομένων θέματος
 fetch('../../api/student/get_student_topic.php')
 .then(res => res.json())
 .then(data => {
@@ -28,14 +45,19 @@ fetch('../../api/student/get_student_topic.php')
     }
 
     let html = `
-        <h3>${data.topic.title}</h3>
+        <h2>${data.topic.title}</h2>
         <p><strong>Περιγραφή:</strong> ${data.topic.summary}</p>
-        <p><strong>Αρχείο:</strong> <a href="${data.topic.pdf_path}" target="_blank">Λήψη PDF</a></p>
-        <p><strong>Κατάσταση:</strong> ${data.thesis.status}</p>
     `;
 
-    if(data.thesis.assignment_date){
-        html += `<p><strong>Ημέρες από ανάθεση:</strong> ${data.days_since_assignment} ημέρες</p>`;
+    if(data.topic.pdf_path){
+        html += `<p><strong>Αρχείο PDF:</strong> <a href="${data.topic.pdf_path}" target="_blank">Λήψη PDF</a></p>`;
+    }
+
+    if(data.thesis){
+        html += `<p><strong>Κατάσταση Διπλωματικής:</strong> ${data.thesis.status}</p>`;
+        if(data.thesis.assignment_date){
+            html += `<p><strong>Ημέρες από ανάθεση:</strong> ${data.days_since_assignment} ημέρες</p>`;
+        }
     }
 
     if(data.committee && data.committee.length > 0){
@@ -54,3 +76,4 @@ fetch('../../api/student/get_student_topic.php')
 </script>
 </body>
 </html>
+
