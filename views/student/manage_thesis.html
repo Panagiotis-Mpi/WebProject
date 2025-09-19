@@ -4,36 +4,37 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Διαχείριση Διπλωματικής</title>
-<style>
-body{font-family:Arial; max-width:800px; margin:auto; padding:1rem;}
-h2,h3{text-align:center;}
-section{margin-bottom:2rem; padding:1rem; border:1px solid #ccc; border-radius:8px;}
-button{padding:0.5rem; margin-top:0.5rem; border-radius:5px; cursor:pointer;}
-table{width:100%; border-collapse:collapse; margin-top:1rem;}
-th,td{border:1px solid #ccc; padding:0.5rem; text-align:left;}
-input,select{padding:0.3rem; width:95%;}
-#message{margin-top:1rem; font-weight:bold;}
-</style>
+<link rel="stylesheet" href="../../assets/css/student/manage_thesis.css">
 </head>
 <body>
 
-<h2>Διαχείριση Διπλωματικής Εργασίας</h2>
-<div id="message"></div>
+<header>
+    <img src="../../assets/img/ceid.png" alt="CEID Logo" class="logo">
+    <h1>Διαχείριση Διπλωματικής</h1>
+    <button class="logout-btn" onclick="logout()">Αποσύνδεση</button>
+</header>
 
-<section id="thesisInfo"></section>
+<main>
+    <div class="container">
+        <div id="message"></div>
 
-<section id="inviteSection"></section>
-<section id="underReviewSection"></section>
-<section id="completedSection"></section>
+        <section id="thesisInfo"></section>
+        <section id="inviteSection"></section>
+        <section id="underReviewSection"></section>
+        <section id="completedSection"></section>
 
-<button onclick="location.href='student_dashboard.html'">Επιστροφή στο Dashboard</button>
+        <button class="back-btn" onclick="window.location.href='student_dashboard.html'">Πίσω</button>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2025 Πανεπιστήμιο Πατρών - Πλατφόρμα Διπλωματικών - Τμήμα Μηχανικών Η/Υ & Πληροφορικής</p>
+</footer>
 
 <script>
-// =====================
-// Helper
-// =====================
 function logout(){
-    fetch('../../api/logout.php').then(()=>window.location.href='../login.html');
+    fetch('../../api/auth/logout.php')
+        .then(() => window.location.href = '../auth/login.html');
 }
 
 // =====================
@@ -137,9 +138,6 @@ function renderUnderReviewSection(t){
     document.getElementById('underReviewSection').innerHTML = html;
 }
 
-// --------------------
-// Υπολειπόμενες AJAX functions (uploadDraft, addMaterial, addPresentation)
-// --------------------
 function uploadDraft(thesis_id){
     const fileInput = document.getElementById('draftFile');
     if(fileInput.files.length===0){ alert("Επιλέξτε αρχείο"); return; }
@@ -193,5 +191,6 @@ function renderCompletedSection(t){
 // =====================
 fetchThesis();
 </script>
+
 </body>
 </html>
