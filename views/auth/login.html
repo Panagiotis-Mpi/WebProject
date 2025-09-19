@@ -3,51 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Διπλωματική</title>
-    <style>
-        body { font-family: Arial; padding: 2rem; }
-        form { max-width: 400px; margin: auto; display: flex; flex-direction: column; gap: 1rem; }
-        input { padding: 0.5rem; font-size: 1rem; }
-        button { padding: 0.7rem; font-size: 1rem; cursor: pointer; }
-    </style>
+    <title>Σύνδεση - Διπλωματική</title>
+    <link rel="stylesheet" href="../../assets/css/auth/login.css">
 </head>
 <body>
-    <h2>Σύνδεση</h2>
-    <form id="loginForm">
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Κωδικός" required>
-        <button type="submit">Σύνδεση</button>
-    </form>
 
-    <script>
-        const loginForm = document.getElementById('loginForm');
+<header>
+    <img src="../../assets/img/ceid.png" alt="CEID Logo" class="logo">
+    <h1>Πλατφόρμα Διπλωματικών</h1>
+</header>
 
-        loginForm.addEventListener('submit', function(e){
-            e.preventDefault();
+<main>
+    <div class="login-container">
+        <h2>Σύνδεση</h2>
+        <form id="loginForm">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Κωδικός" required>
+            <button type="submit" class="login-btn">Σύνδεση</button>
+        </form>
+        <div id="message"></div>
+    </div>
+</main>
 
-            const formData = new FormData(loginForm);
+<footer>
+    <p>&copy; 2025 Πανεπιστήμιο Πατρών - Πλατφόρμα Διπλωματικών</p>
+</footer>
 
-            fetch('../../api/auth/login.php', {   // <-- νέο path API
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success){
-                    // Redirect ανάλογα με ρόλο
-                    if(data.role === 'student'){
-                        window.location.href = '../student/student_dashboard.html';
-                    } else if(data.role === 'professor'){
-                        window.location.href = '../professor/professor_dashboard.html';
-                    } else if(data.role === 'secretary'){
-                        window.location.href = '../secretary/secretary_dashboard.html';
-                    }
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(err => console.error(err));
-        });
-    </script>
+<script>
+const loginForm = document.getElementById('loginForm');
+
+loginForm.addEventListener('submit', function(e){
+    e.preventDefault();
+
+    const formData = new FormData(loginForm);
+
+    fetch('../../api/auth/login.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            if(data.role === 'student'){
+                window.location.href = '../student/student_dashboard.html';
+            } else if(data.role === 'professor'){
+                window.location.href = '../professor/professor_dashboard.html';
+            } else if(data.role === 'secretary'){
+                window.location.href = '../secretary/secretary_dashboard.html';
+            }
+        } else {
+            const msg = document.getElementById("message");
+            msg.textContent = data.message;
+            msg.style.color = "red";
+        }
+    })
+    .catch(() => {
+        const msg = document.getElementById("message");
+        msg.textContent = "Σφάλμα επικοινωνίας με τον server.";
+        msg.style.color = "red";
+    });
+});
+</script>
+
 </body>
 </html>
