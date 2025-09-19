@@ -3,61 +3,98 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Προβολή Διπλωματικών</title>
-<style>
-body{font-family:Arial;max-width:800px;margin:auto;padding:1rem;}
-h2{text-align:center;}
-ul{list-style:none;padding:0;}
-li{margin:0.5rem 0;padding:0.5rem;border:1px solid #ccc;border-radius:5px;cursor:pointer;}
-.details{margin-top:1rem;padding:1rem;border:1px solid #aaa;border-radius:5px;background:#f9f9f9;}
-button{margin-top:1rem;padding:0.5rem 1rem;cursor:pointer;border-radius:5px;}
-</style>
+<title>Γραμματεία - Προβολή Διπλωματικών</title>
+<link rel="stylesheet" href="../../assets/css/secretary/view_theses.css">
 </head>
 <body>
-<h2>Προβολή Διπλωματικών</h2>
-<ul id="thesesList"></ul>
 
-<div id="details" class="details" style="display:none;"></div>
+<header>
+    <img src="../../assets/img/ceid.png" alt="CEID Logo" class="logo">
+    <h1>Γραμματεία - Προβολή Διπλωματικών</h1>
+    <button class="logout-btn" onclick="logout()">Αποσύνδεση</button>
+</header>
 
-<button onclick="window.location.href='secretary_dashboard.html'">Επιστροφή στο Dashboard</button>
+<main>
+    <div class="container" id="thesesContainer">
+        <p>Φόρτωση διπλωματικών...</p>
+    </div>
+</main>
+
+<button class="back-btn" id="backBtn">⬅️ Επιστροφή στο Dashboard</button>
+
+<footer>
+    <p>&copy; 2025 Πανεπιστήμιο Πατρών - Πλατφόρμα Διπλωματικών - Τμήμα Μηχανικών Η/Υ & Πληροφορικής</p>
+</footer>
 
 <script>
-document.addEventListener("DOMContentLoaded", ()=>{
-    fetch("../../api/secretary/view_theses.php")
-    .then(res=>res.json())
-    .then(data=>{
-        if(data.success){
-            const list=document.getElementById("thesesList");
-            data.data.forEach(thesis=>{
-                const li=document.createElement("li");
-                li.textContent = thesis.title + " ("+thesis.status+")";
-                li.onclick = ()=>showDetails(thesis);
-                list.appendChild(li);
-            });
-        }else{
-            alert("Σφάλμα: " + data.message);
-        }
-    });
+function logout(){
+    fetch('../../api/auth/logout.php')
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) window.location.href='secretary_dashboard.html';
+            else alert('Σφάλμα κατά την αποσύνδεση');
+        })
+        .catch(() => alert('Σφάλμα επικοινωνίας με τον server'));
+}
+
+document.getElementById("backBtn").addEventListener("click", () => {
+    window.location.href = 'secretary_dashboard.html';
 });
 
-function showDetails(thesis){
-    const div=document.getElementById("details");
-    div.style.display="block";
-    div.innerHTML = `
-        <h3>${thesis.title}</h3>
-        <p><b>Περιγραφή:</b> ${thesis.summary}</p>
-        <p><b>Κατάσταση:</b> ${thesis.status}</p>
-        <p><b>Ημέρες από ανάθεση:</b> ${thesis.days_passed !== null ? thesis.days_passed + " ημέρες" : "Δεν έχει ανατεθεί ακόμα"}</p>
-        <h4>Τριμελής Επιτροπή:</h4>
-        <ul>
-            ${thesis.committee.length > 0 ? 
-                thesis.committee.map(m=>`<li>${m.first_name} ${m.last_name} (${m.role})</li>`).join("") 
-                : "<li>Δεν έχουν οριστεί μέλη</li>"
-            }
-        </ul>
-    `;
-}
+document.addEventListener("DOMContentLoaded", () => {
+    const container = document.getElementById("thesesContainer");
+    fetch("../../api/secretary/view_theses.php")
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            container.innerHTML = "";
+            data.data.forEach(thesis => {
+                const card = document.createElement("div");
+                card.className = "thesis-card";
+
+                card.innerHTML = `
+                    <h3>${thesis.title}</h3>
+                    <p><b>Κατάσταση:</b> ${thesis.status}</p>
+                    <button class="details-btn">Προβολή Λεπτομερειών</button>
+                    <div class="details">
+                        <p><b>Περιγραφή:</b> ${thesis.summary}</p>
+                        <p><b>Ημέρες από ανάθεση:</b> ${thesis.days_passed !== null ? thesis.days_passed + " ημέρες" : "Δεν έχει ανατεθεί ακόμα"}</p>
+                        <h4>Τριμελής Επιτροπή:</h4>
+                        <ul>
+                        ${thesis.committee.length > 0 ? 
+                            thesis.committee.map(m => `<li>${m.first_name} ${m.last_name} (${m.role})</li>`).join("") 
+                            : "<li>Δεν έχουν οριστεί μέλη</li>"
+                        }
+                        </ul>
+                    </div>
+                `;
+
+                const detailsBtn = card.querySelector(".details-btn");
+                const detailsDiv = card.querySelector(".details");
+                detailsDiv.style.display = "none";
+
+                detailsBtn.addEventListener("click", () => {
+                    if(detailsDiv.style.display === "none"){
+                        detailsDiv.style.display = "block";
+                        detailsBtn.textContent = "Απόκρυψη Λεπτομερειών";
+                    } else {
+                        detailsDiv.style.display = "none";
+                        detailsBtn.textContent = "Προβολή Λεπτομερειών";
+                    }
+                });
+
+                container.appendChild(card);
+            });
+        } else {
+            container.innerHTML = `<p style="color:red;">Σφάλμα: ${data.message}</p>`;
+        }
+    })
+    .catch(() => {
+        container.innerHTML = `<p style="color:red;">Σφάλμα επικοινωνίας με τον server</p>`;
+    });
+});
 </script>
+
 </body>
 </html>
 
