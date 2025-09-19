@@ -3,59 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Αλλαγή Κατάστασης Διπλωματικής</title>
-<style>
-body { font-family: Arial; max-width: 800px; margin: auto; padding: 1rem; }
-h2 { text-align: center; }
-label { display: block; margin-top: 1rem; }
-input, select, textarea, button { width: 100%; padding: 0.5rem; margin-top: 0.5rem; }
-#message { margin-top: 1rem; font-weight: bold; }
-.hidden { display: none; }
-</style>
+<title>Γραμματεία - Αλλαγή Κατάστασης Διπλωματικής</title>
+<link rel="stylesheet" href="../../assets/css/secretary/change_thesis_status.css">
 </head>
 <body>
 
-<h2>Αλλαγή Κατάστασης Διπλωματικής</h2>
+<header>
+    <img src="../../assets/img/ceid.png" alt="CEID Logo" class="logo">
+    <h1>Γραμματεία - Αλλαγή Κατάστασης Διπλωματικής</h1>
+    <button class="logout-btn" onclick="logout()">Αποσύνδεση</button>
+</header>
 
-<label>Επιλογή Διπλωματικής:</label>
-<select id="thesisSelect">
-    <option value="">-- Επιλέξτε ΔΕ --</option>
-</select>
+<main>
+    <div class="container">
+        <label>Επιλογή Διπλωματικής:</label>
+        <select id="thesisSelect">
+            <option value="">-- Επιλέξτε ΔΕ --</option>
+        </select>
 
-<div id="details" class="hidden">
-    <label>Τρέχουσα Κατάσταση:</label>
-    <input type="text" id="currentStatus" readonly>
+        <div id="details" class="hidden">
+            <label>Τρέχουσα Κατάσταση:</label>
+            <input type="text" id="currentStatus" readonly>
 
-    <div id="activeFields" class="hidden">
-        <label>Αριθμός & Έτος ΓΣ (για ανάθεση/ακύρωση):</label>
-        <input type="text" id="gsNumber">
+            <div id="activeFields" class="hidden">
+                <label>Αριθμός & Έτος ΓΣ (για ανάθεση/ακύρωση):</label>
+                <input type="text" id="gsNumber">
 
-        <label>Λόγος Ακύρωσης:</label>
-        <textarea id="cancelReason"></textarea>
+                <label>Λόγος Ακύρωσης:</label>
+                <textarea id="cancelReason"></textarea>
 
-        <button onclick="updateThesis('active')">Καταχώρηση Αλλαγών / Ακύρωση</button>
+                <button onclick="updateThesis('active')">Καταχώρηση Αλλαγών / Ακύρωση</button>
+            </div>
+
+            <div id="underReviewFields" class="hidden">
+                <label>Σύνδεσμος Νημερτή (αν έχει ανέβει):</label>
+                <input type="text" id="nimertiLink">
+
+                <label>Βαθμός (αν έχει καταχωρηθεί):</label>
+                <input type="number" id="grade" min="0" max="10" step="0.01">
+
+                <button onclick="updateThesis('under_review')">Ολοκλήρωση ΔΕ</button>
+            </div>
+        </div>
+
+        <div id="message"></div>
+        <button class="back-btn" id="backBtn">⬅️ Επιστροφή στο Dashboard</button>
     </div>
+</main>
 
-    <div id="underReviewFields" class="hidden">
-        <label>Σύνδεσμος Νημερτή (αν έχει ανέβει):</label>
-        <input type="text" id="nimertiLink">
-
-        <label>Βαθμός (αν έχει καταχωρηθεί):</label>
-        <input type="number" id="grade" min="0" max="10" step="0.01">
-
-        <button onclick="updateThesis('under_review')">Ολοκλήρωση ΔΕ</button>
-    </div>
-</div>
-
-<div id="message"></div>
+<footer>
+    <p>&copy; 2025 Πανεπιστήμιο Πατρών - Πλατφόρμα Διπλωματικών</p>
+</footer>
 
 <script>
+function logout(){
+    fetch('../../api/auth/logout.php')
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) window.location.href='../auth/login.html';
+        })
+        .catch(() => alert('Σφάλμα επικοινωνίας με τον server'));
+}
+
+document.getElementById('backBtn').addEventListener('click', () => {
+    window.location.href='secretary_dashboard.html';
+});
+
 const thesisSelect = document.getElementById('thesisSelect');
 const detailsDiv = document.getElementById('details');
 const activeFields = document.getElementById('activeFields');
 const underReviewFields = document.getElementById('underReviewFields');
 const currentStatusInput = document.getElementById('currentStatus');
-
 let thesesData = [];
 
 fetch('../../api/secretary/get_active_underreview_theses.php')
@@ -66,12 +84,10 @@ fetch('../../api/secretary/get_active_underreview_theses.php')
         data.theses.forEach(t => {
             const opt = document.createElement('option');
             opt.value = t.id;
-            opt.textContent = t.title + " [" + t.status + "]";
+            opt.textContent = `${t.title} [${t.status}]`;
             thesisSelect.appendChild(opt);
         });
-    } else {
-        alert("Σφάλμα φόρτωσης Διπλωματικών.");
-    }
+    } else alert("Σφάλμα φόρτωσης Διπλωματικών.");
 });
 
 thesisSelect.addEventListener('change', function(){
@@ -80,12 +96,10 @@ thesisSelect.addEventListener('change', function(){
         detailsDiv.classList.add('hidden');
         return;
     }
-
     const thesis = thesesData.find(t => t.id == id);
     currentStatusInput.value = thesis.status;
     detailsDiv.classList.remove('hidden');
 
-    // Εμφάνιση ανάλογων πεδίων
     if(thesis.status === 'active'){
         activeFields.classList.remove('hidden');
         underReviewFields.classList.add('hidden');
@@ -97,19 +111,13 @@ thesisSelect.addEventListener('change', function(){
 
 function updateThesis(status){
     const id = thesisSelect.value;
-    const gsNumber = document.getElementById('gsNumber').value;
-    const cancelReason = document.getElementById('cancelReason').value;
-    const nimertiLink = document.getElementById('nimertiLink').value;
-    const grade = document.getElementById('grade').value;
-
     const payload = { thesis_id: id, status };
-
     if(status === 'active'){
-        payload.gs_number = gsNumber;
-        payload.cancel_reason = cancelReason;
+        payload.gs_number = document.getElementById('gsNumber').value;
+        payload.cancel_reason = document.getElementById('cancelReason').value;
     } else if(status === 'under_review'){
-        payload.nimerti_link = nimertiLink;
-        payload.grade = grade;
+        payload.nimerti_link = document.getElementById('nimertiLink').value;
+        payload.grade = document.getElementById('grade').value;
     }
 
     fetch('../../api/secretary/update_thesis_status.php', {
@@ -122,7 +130,7 @@ function updateThesis(status){
         const msgDiv = document.getElementById('message');
         msgDiv.textContent = data.message;
         msgDiv.style.color = data.success ? "green" : "red";
-        if(data.success) location.reload(); // ανανέωση λίστας ΔΕ
+        if(data.success) location.reload();
     })
     .catch(() => {
         const msgDiv = document.getElementById('message');
