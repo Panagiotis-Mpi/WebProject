@@ -4,37 +4,44 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Επεξεργασία Προφίλ</title>
-<style>
-body { font-family: Arial; max-width: 800px; margin: auto; padding: 1rem; }
-h2 { text-align: center; }
-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-th { background-color: #f2f2f2; }
-input { width: 100%; padding: 5px; border: none; background: transparent; }
-input:read-only { background: #f9f9f9; color: #555; }
-button { margin-top: 1rem; padding: 0.7rem; border: none; border-radius: 5px; background: #4CAF50; color: white; cursor: pointer; width: 100%; }
-button:hover { background: #45a049; }
-#message { margin-top: 1rem; font-weight: bold; }
-</style>
+<link rel="stylesheet" href="../../assets/css/student/edit_profile.css">
 </head>
 <body>
-<h2>Επεξεργασία Προφίλ</h2>
+<header>
+    <img src="../../assets/img/ceid.png" alt="CEID Logo" class="logo">
+    <h1>Επεξεργασία Προφίλ</h1>
+    <button class="logout-btn" onclick="logout()">Αποσύνδεση</button>
+</header>
 
-<table>
-    <tr><th>Αριθμός Μητρώου (AM)</th><td><input type="text" id="am" readonly></td></tr>
-    <tr><th>Email</th><td><input type="email" id="email" readonly></td></tr>
-    <tr><th>Όνομα</th><td><input type="text" id="first_name"></td></tr>
-    <tr><th>Επώνυμο</th><td><input type="text" id="last_name"></td></tr>
-    <tr><th>Τηλέφωνο</th><td><input type="text" id="phone"></td></tr>
-    <tr><th>Νέος Κωδικός</th><td><input type="password" id="password" placeholder="(προαιρετικό)"></td></tr>
-</table>
+<main>
+    <div class="profile-container">
+        <h2>Επεξεργασία Προφίλ</h2>
+        <table>
+            <tr><th>Αριθμός Μητρώου (AM)</th><td><input type="text" id="am" readonly></td></tr>
+            <tr><th>Email</th><td><input type="email" id="email" readonly></td></tr>
+            <tr><th>Όνομα</th><td><input type="text" id="first_name"></td></tr>
+            <tr><th>Επώνυμο</th><td><input type="text" id="last_name"></td></tr>
+            <tr><th>Τηλέφωνο</th><td><input type="text" id="phone"></td></tr>
+            <tr><th>Νέος Κωδικός</th><td><input type="password" id="password" placeholder="(προαιρετικό)"></td></tr>
+        </table>
 
-<button onclick="updateProfile()">Αποθήκευση αλλαγών</button>
-<div id="message"></div>
+        <button class="save-btn" onclick="updateProfile()">Αποθήκευση αλλαγών</button>
+        <div id="message"></div>
+    </div>
 
-<button onclick="window.location.href='student_dashboard.html'">Επιστροφή στο Dashboard</button>
+    <button class="back-btn" onclick="window.location.href='student_dashboard.html'">Πίσω</button>
+</main>
+
+<footer>
+    <p>&copy; 2025 Πανεπιστήμιο Πατρών - Πλατφόρμα Διπλωματικών - Τμήμα Μηχανικών Η/Υ & Πληροφορικής</p>
+</footer>
 
 <script>
+function logout(){
+    fetch('../../api/auth/logout.php')
+        .then(() => window.location.href = '../auth/login.html');
+}
+
 // Φόρτωση στοιχείων φοιτητή
 window.onload = function() {
     fetch("../../api/student/get_profile.php")
@@ -47,8 +54,9 @@ window.onload = function() {
             document.getElementById("last_name").value = data.user.last_name;
             document.getElementById("phone").value = data.user.phone || "";
         } else {
-            document.getElementById("message").textContent = "Σφάλμα φόρτωσης προφίλ.";
-            document.getElementById("message").style.color = "red";
+            const msg = document.getElementById("message");
+            msg.textContent = "Σφάλμα φόρτωσης προφίλ.";
+            msg.style.color = "red";
         }
     });
 };
@@ -77,3 +85,4 @@ function updateProfile(){
 </script>
 </body>
 </html>
+
