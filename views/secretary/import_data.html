@@ -3,26 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Εισαγωγή Δεδομένων (JSON)</title>
-<style>
-body { font-family: Arial; max-width: 600px; margin: auto; padding: 1rem; }
-h2 { text-align: center; }
-input, button { margin-top: 1rem; width: 100%; padding: 0.5rem; }
-#message { margin-top: 1rem; font-weight: bold; }
-</style>
+<title>Γραμματεία - Εισαγωγή Δεδομένων</title>
+<link rel="stylesheet" href="../../assets/css/secretary/import_data.css">
 </head>
 <body>
-<h2>Εισαγωγή Δεδομένων</h2>
-<p>Επιλέξτε αρχείο JSON με πληροφορίες φοιτητών, καθηγητών και γραμματείας.</p>
-<input type="file" id="jsonFile" accept=".json">
-<button onclick="uploadData()">Ανέβασμα</button>
 
-<div id="message"></div>
+<header>
+    <img src="../../assets/img/ceid.png" alt="CEID Logo" class="logo">
+    <h1>Γραμματεία - Εισαγωγή Δεδομένων</h1>
+    <button class="logout-btn" onclick="logout()">Αποσύνδεση</button>
+</header>
 
-<button onclick="window.location.href='secretary_dashboard.html'">Επιστροφή στο Dashboard</button>
+<main>
+    <div class="container">
+        <p>Επιλέξτε αρχείο JSON με πληροφορίες φοιτητών και καθηγητών.</p>
+        <input type="file" id="jsonFile" accept=".json">
+        <button id="uploadBtn">Ανέβασμα</button>
+        <div id="message"></div>
+
+        <button class="back-btn" id="backBtn">⬅️ Επιστροφή στο Dashboard</button>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2025 Πανεπιστήμιο Πατρών - Πλατφόρμα Διπλωματικών</p>
+</footer>
 
 <script>
-function uploadData(){
+function logout(){
+    fetch('../../api/auth/logout.php')
+        .then(res => res.json())
+        .then(data => {
+            if(data.success){
+                window.location.href='../auth/login.html';
+            } else {
+                alert('Σφάλμα κατά την αποσύνδεση');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Σφάλμα επικοινωνίας με τον server');
+        });
+}
+
+document.getElementById('backBtn').addEventListener('click', () => {
+    window.location.href='secretary_dashboard.html';
+});
+
+document.getElementById('uploadBtn').addEventListener('click', () => {
     const fileInput = document.getElementById('jsonFile');
     const messageDiv = document.getElementById('message');
 
@@ -50,6 +78,7 @@ function uploadData(){
                 messageDiv.style.color = data.success ? "green" : "red";
             })
             .catch(err => {
+                console.error(err);
                 messageDiv.textContent = "Σφάλμα επικοινωνίας με τον server.";
                 messageDiv.style.color = "red";
             });
@@ -61,7 +90,8 @@ function uploadData(){
     };
 
     reader.readAsText(file);
-}
+});
 </script>
+
 </body>
 </html>
