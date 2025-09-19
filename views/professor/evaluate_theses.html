@@ -4,61 +4,59 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Αξιολόγηση Διπλωματικών</title>
-<style>
-body {
-    font-family: Arial, sans-serif;
-    max-width: 800px;
-    margin: auto;
-    padding: 1rem;
-}
-h2 { text-align: center; }
-select, input, button {
-    width: 100%;
-    padding: 0.5rem;
-    margin: 0.5rem 0;
-}
-.grade-section {
-    border: 1px solid #ccc;
-    padding: 1rem;
-    margin-top: 1rem;
-    border-radius: 5px;
-}
-label { display: block; margin-top: 0.5rem; }
-button { cursor: pointer; border-radius: 5px; }
-</style>
+<link rel="stylesheet" href="../../assets/css/professor/evaluate_theses.css">
 </head>
 <body>
-<h2>Αξιολόγηση Διπλωματικών</h2>
 
-<label for="thesisSelect">Επιλέξτε Διπλωματική:</label>
-<select id="thesisSelect">
-    <option value="">-- Επιλέξτε --</option>
-</select>
+<header>
+    <img src="../../assets/img/ceid.png" alt="CEID Logo" class="logo">
+    <h1>Αξιολόγηση Διπλωματικών</h1>
+    <button class="logout-btn" onclick="logout()">Αποσύνδεση</button>
+</header>
 
-<div class="grade-section" id="gradeSection" style="display:none;">
-    <h3>Βαθμολογία</h3>
-    <label for="contentScore">Περιεχόμενο (0-10):</label>
-    <input type="number" id="contentScore" min="0" max="10" step="0.01">
+<main>
+    <div class="container">
+        <label for="thesisSelect">Επιλέξτε Διπλωματική:</label>
+        <select id="thesisSelect">
+            <option value="">-- Επιλέξτε --</option>
+        </select>
 
-    <label for="organizationScore">Οργάνωση (0-10):</label>
-    <input type="number" id="organizationScore" min="0" max="10" step="0.01">
+        <div class="grade-section" id="gradeSection" style="display:none;">
+            <h3>Βαθμολογία</h3>
+            <label for="contentScore">Περιεχόμενο (0-10):</label>
+            <input type="number" id="contentScore" min="0" max="10" step="0.01">
 
-    <label for="presentationScore">Παρουσίαση (0-10):</label>
-    <input type="number" id="presentationScore" min="0" max="10" step="0.01">
+            <label for="organizationScore">Οργάνωση (0-10):</label>
+            <input type="number" id="organizationScore" min="0" max="10" step="0.01">
 
-    <button id="submitGradeBtn">Καταχώρηση Βαθμού</button>
-</div>
+            <label for="presentationScore">Παρουσίαση (0-10):</label>
+            <input type="number" id="presentationScore" min="0" max="10" step="0.01">
 
-<!-- Κουμπί επιστροφής στο dashboard στο τέλος -->
-<button onclick="location.href='professor_dashboard.html'">⬅️ Επιστροφή στο Dashboard</button>
+            <button id="submitGradeBtn">Καταχώρηση Βαθμού</button>
+        </div>
+
+        <button class="back-btn" id="backBtn">Πίσω</button>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2025 Πανεπιστήμιο Πατρών - Πλατφόρμα Διπλωματικών</p>
+</footer>
 
 <script>
+function logout(){
+    fetch('../../api/auth/logout.php')
+        .then(() => window.location.href = '../auth/login.html');
+}
+
+// Επιλογή διπλωματικής
 const thesisSelect = document.getElementById('thesisSelect');
 const gradeSection = document.getElementById('gradeSection');
 const contentScoreInput = document.getElementById('contentScore');
 const organizationScoreInput = document.getElementById('organizationScore');
 const presentationScoreInput = document.getElementById('presentationScore');
 const submitBtn = document.getElementById('submitGradeBtn');
+const backBtn = document.getElementById('backBtn');
 
 let selectedThesisId = null;
 
@@ -86,21 +84,14 @@ thesisSelect.addEventListener('change', () => {
         return;
     }
 
-    // Φόρτωση βαθμών αν υπάρχουν
     fetch(`../../api/professor/get_grades_for_thesis.php?thesis_id=${selectedThesisId}`)
     .then(res => res.json())
     .then(data => {
         if(data.success){
-            let grade = data.grades.find(g => true); // Βαθμός του τρέχοντος καθηγητή
-            if(grade){
-                contentScoreInput.value = grade.content_score;
-                organizationScoreInput.value = grade.organization_score;
-                presentationScoreInput.value = grade.presentation_score;
-            } else {
-                contentScoreInput.value = '';
-                organizationScoreInput.value = '';
-                presentationScoreInput.value = '';
-            }
+            let grade = data.grades.find(g => true);
+            contentScoreInput.value = grade ? grade.content_score : '';
+            organizationScoreInput.value = grade ? grade.organization_score : '';
+            presentationScoreInput.value = grade ? grade.presentation_score : '';
             gradeSection.style.display = 'block';
         } else {
             alert(" Σφάλμα: " + data.message);
@@ -119,8 +110,6 @@ submitBtn.addEventListener('click', () => {
         alert("Επιλέξτε διπλωματική!");
         return;
     }
-
-    // Έλεγχος 0-10
     if(contentScore < 0 || contentScore > 10 ||
        organizationScore < 0 || organizationScore > 10 ||
        presentationScore < 0 || presentationScore > 10){
@@ -147,6 +136,12 @@ submitBtn.addEventListener('click', () => {
         }
     });
 });
+
+// Επιστροφή
+backBtn.addEventListener('click', () => {
+    window.location.href = 'professor_dashboard.html';
+});
 </script>
+
 </body>
 </html>
