@@ -4,50 +4,59 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Στατιστικά Διπλωματικών</title>
+<link rel="stylesheet" href="../../assets/css/professor/statistics.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-body { font-family: Arial, sans-serif; max-width: 700px; margin: auto; padding: 1rem; }
-h2 { text-align: center; }
-canvas { margin-top: 2rem; }
-#backBtn { margin-top: 1rem; width: 100%; padding: 0.5rem; }
-</style>
 </head>
 <body>
-<h2>Στατιστικά Διπλωματικών</h2>
 
-<canvas id="durationChart" height="150"></canvas>
-<canvas id="gradeChart" height="150"></canvas>
-<canvas id="countChart" height="150"></canvas>
+<header>
+    <img src="../../assets/img/ceid.png" alt="CEID Logo" class="logo">
+    <h1>Στατιστικά Διπλωματικών</h1>
+    <button class="logout-btn" onclick="logout()">Αποσύνδεση</button>
+</header>
 
-<button id="backBtn">Επιστροφή στο Dashboard</button>
+<main>
+    <div class="container">
+        <canvas id="durationChart" height="150"></canvas>
+        <canvas id="gradeChart" height="150"></canvas>
+        <canvas id="countChart" height="150"></canvas>
+
+        <button class="back-btn" id="backBtn">Πίσω</button>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2025 Πανεπιστήμιο Πατρών - Πλατφόρμα Διπλωματικών</p>
+</footer>
 
 <script>
+function logout(){
+    fetch('../../api/auth/logout.php')
+        .then(() => window.location.href = '../auth/login.html');
+}
+
 fetch('../../api/professor/get_professor_statistics.php')
 .then(res => res.json())
 .then(data => {
     if(!data.success){ alert(data.message); return; }
 
-    // Δεδομένα
     const labels = ['Ως Επιβλέπων','Ως Μέλος Τριμελούς'];
     const durations = [data.supervisor.avg_duration, data.member.avg_duration];
     const grades = [data.supervisor.avg_grade, data.member.avg_grade];
     const counts = [data.supervisor.total_count, data.member.total_count];
 
-    // Μέσος χρόνος περάτωσης
     new Chart(document.getElementById('durationChart'), {
         type: 'bar',
         data: { labels, datasets:[{label:'Μέσος Χρόνος (ημέρες)', data:durations, backgroundColor:['rgba(54,162,235,0.7)','rgba(153,102,255,0.7)']}] },
         options:{ responsive:true, plugins:{legend:{display:false}} }
     });
 
-    // Μέσος βαθμός
     new Chart(document.getElementById('gradeChart'), {
         type: 'bar',
         data: { labels, datasets:[{label:'Μέσος Βαθμός', data:grades, backgroundColor:['rgba(75,192,192,0.7)','rgba(255,206,86,0.7)']}] },
         options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{min:0,max:10}} }
     });
 
-    // Συνολικό πλήθος
     new Chart(document.getElementById('countChart'), {
         type: 'bar',
         data: { labels, datasets:[{label:'Συνολικές Διπλωματικές', data:counts, backgroundColor:['rgba(255,159,64,0.7)','rgba(255,99,132,0.7)']}] },
@@ -55,10 +64,11 @@ fetch('../../api/professor/get_professor_statistics.php')
     });
 });
 
-// Επιστροφή στο Dashboard
+// Κουμπί επιστροφής
 document.getElementById('backBtn').addEventListener('click',()=>{
     window.location.href='professor_dashboard.html';
 });
 </script>
+
 </body>
 </html>
