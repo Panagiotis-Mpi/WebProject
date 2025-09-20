@@ -57,80 +57,95 @@ main {
     align-items: center;
 }
 
-/* Container for sections */
+/* Topic container */
 .container {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    max-width: 700px;
     width: 90%;
-    max-width: 800px;
     margin: 2rem auto;
 }
 
-/* Sections */
-section {
-    background: white;
-    border-radius: 10px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+.container h2 {
+    text-align: center;
+    color: #004080;
+    margin-bottom: 1rem;
 }
 
-h2, h3 {
-    text-align: center;
+/* Lists */
+.container ul {
+    padding-left: 1.2rem;
+    margin-top: 0.5rem;
+}
+
+/* Upload section */
+.upload-section {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.upload-section h3 {
+    margin-bottom: 0.8rem;
     color: #004080;
 }
 
-/* Tables */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-}
-th, td {
-    border: 1px solid #ddd;
-    padding: 0.5rem;
-    text-align: left;
-}
-
-/* Inputs and selects */
-input, select {
-    padding: 0.5rem;
-    width: 95%;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+.upload-section input[type="file"] {
+    display: block;
     margin-bottom: 0.5rem;
 }
 
-/* Buttons */
-button {
-    padding: 0.7rem 1rem;
-    border: none;
-    border-radius: 8px;
+.upload-section button {
     background: #0066cc;
     color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 1rem;
     transition: background 0.3s, transform 0.2s;
 }
-button:hover {
+.upload-section button:hover {
     background: #004080;
     transform: translateY(-2px);
 }
 
-/* Message */
-#message {
-    margin-top: 1rem;
-    font-weight: bold;
+.upload-section p {
+    margin-top: 0.5rem;
 }
 
-/* Κουμπί επιστροφής κάτω δεξιά */
+/* Back button */
 .back-btn {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    z-index: 100;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #0066cc;
+    color: white;
+    transition: background 0.3s, transform 0.2s;
+    z-index: 100; 
+}
+
+.back-btn:hover {
+    background: #004080;
+    transform: translateY(-2px);
 }
 
 /* Responsive */
 @media (max-width: 600px) {
+    .container {
+        padding: 1.5rem;
+    }
+    .container h2 {
+        font-size: 1.4rem;
+    }
     header {
         flex-direction: column;
         text-align: center;
@@ -146,7 +161,14 @@ button:hover {
         transform: none;
         margin-top: 0.5rem;
     }
-    .container {
-        width: 95%;
+    .back-btn {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.95rem;
+    }
+    .upload-section {
+        padding: 1rem;
+    }
+    .upload-section button {
+        width: 100%;
     }
 }
