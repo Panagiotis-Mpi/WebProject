@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Προσκλήσεις Τριμελούς Επιτροπής</title>
+<link rel="stylesheet" href="../../assets/css/professor/view_invitations.css">
+</head>
+<body>
+
+<header>
+    <img src="../../assets/img/ceid.png" alt="CEID Logo" class="logo">
+    <h1>Προσκλήσεις Τριμελούς Επιτροπής</h1>
+    <button class="logout-btn" onclick="logout()">Αποσύνδεση</button>
+</header>
+
+<main>
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Φοιτητής</th>
+                    <th>Θέμα</th>
+                    <th>Ενέργεια</th>
+                </tr>
+            </thead>
+            <tbody id="invitationsTable">
+                <tr><td colspan="3">Φόρτωση...</td></tr>
+            </tbody>
+        </table>
+
+        <button class="back-btn" id="backBtn">Πίσω</button>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2025 Πανεπιστήμιο Πατρών - Πλατφόρμα Διπλωματικών - Τμήμα Μηχανικών Η/Υ & Πληροφορικής</p>
+</footer>
+
+<script>
+function logout() {
+    fetch('../../api/auth/logout.php')
+        .then(() => window.location.href = '../auth/login.html');
+}
+
+// Φόρτωση των ενεργών προσκλήσεων
+function loadInvitations() {
+    fetch('../../api/professor/get_committee_invitations.php')
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById('invitationsTable');
+            tbody.innerHTML = '';
+
+            if (data.success) {
+                data.invitations.forEach(inv => {
+                    const tr = document.createElement('tr');
+
+                    // Αν η διπλωματική έγινε active, αλλάζουμε το χρώμα ή βάζουμε ένδειξη
+                    let statusIndicator = '';
+                    if (inv.thesis_status === 'active') {
+                        statusIndicator = ' (Active)';
+                    }
+
+                    tr.innerHTML = `
+                        <td>${inv.first_name} ${inv.last_name}</td>
+                        <td>${inv.topic_title}${statusIndicator}</td>
+                        <td>
+                            <button onclick="respond(${inv.invitation_id}, 'accept')">✅ Αποδοχή</button>
+                            <button onclick="respond(${inv.invitation_id}, 'reject')">❌ Απόρριψη</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                if (data.invitations.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3">Δεν υπάρχουν ενεργές προσκλήσεις</td></tr>';
+                }
+            } else {
+                tbody.innerHTML = `<tr><td colspan="3" style="color:red">${data.message}</td></tr>`;
+            }
+        })
+        .catch(err => {
+            console.error("AJAX Error:", err);
+            const tbody = document.getElementById('invitationsTable');
+            tbody.innerHTML = '<tr><td colspan="3" style="color:red">Σφάλμα φόρτωσης προσκλήσεων</td></tr>';
+        });
+}
+
+// Απάντηση σε πρόσκληση
+function respond(invitation_id, action) {
+    fetch('../../api/professor/respond_committee_invitation.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invitation_id, action })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            // Φορτώνουμε ξανά τις προσκλήσεις μετά την αλλαγή
+            loadInvitations();
+        } else {
+            alert("Σφάλμα: " + data.message);
+        }
+    })
+    .catch(err => {
+        console.error("AJAX Error:", err);
+        alert("Προέκυψε σφάλμα κατά την επικοινωνία με τον server.");
+    });
+}
+
+// Φόρτωση κατά την έναρξη
+document.addEventListener('DOMContentLoaded', loadInvitations);
+
+// Κουμπί επιστροφής
+document.getElementById('backBtn').addEventListener('click', () => {
+    window.location.href = 'professor_dashboard.html';
+});
+</script>
+
+</body>
+</html>

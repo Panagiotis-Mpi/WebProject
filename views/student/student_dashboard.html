@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Φοιτητής - Dashboard</title>
+<link rel="stylesheet" href="../../assets/css/student/student_dashboard.css">
+</head>
+<body>
+
+<header>
+    <img src="../../assets/img/ceid.png" alt="CEID Logo" class="logo">
+    <h1>Φοιτητής - Dashboard</h1>
+    <button class="logout-btn" onclick="logout()">Αποσύνδεση</button>
+</header>
+
+<main>
+    <div class="container menu">
+        <button onclick="location.href='view_topic.html'">Προβολή Θέματος</button>
+        <button onclick="location.href='edit_profile.html'">Επεξεργασία Προφίλ</button>
+        <button onclick="location.href='manage_thesis.html'">Διαχείριση Διπλωματικής</button>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2025 Πανεπιστήμιο Πατρών - Πλατφόρμα Διπλωματικών - Τμήμα Μηχανικών Η/Υ & Πληροφορικής</p>
+</footer>
+
+<script>
+function logout(){
+    fetch('../../api/auth/logout.php')
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) window.location.href='../auth/login.html';
+            else alert('Σφάλμα κατά την αποσύνδεση');
+        })
+        .catch(() => alert('Σφάλμα επικοινωνίας με τον server'));
+}
+</script>
+
+</body>
+</html>
