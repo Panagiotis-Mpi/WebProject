@@ -24,6 +24,31 @@ header .logo {
     height: 60px;
 }
 
+/* Κουμπί Ανακοινώσεις */
+header .header-announcements-btn {
+    position: absolute;
+    top: 50%;
+    right: 3rem; 
+    transform: translateY(-50%);
+    background: #f8f8f8;
+    color: #004080;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s, color 0.3s;
+}
+header .header-announcements-btn:hover {
+    background: #e0e0e0;
+    color: #002050;
+}
+
+/* Απόκρυψη κουμπιού logout */
+header .logout-btn {
+    display: none;
+}
+
 /* Footer */
 footer {
     background: #004080;
@@ -101,5 +126,10 @@ main {
         position: static;
         margin-bottom: 0.5rem;
         height: 50px;
+    }
+    header .header-announcements-btn {
+        position: static;
+        transform: none;
+        margin-top: 0.5rem;
     }
 }
