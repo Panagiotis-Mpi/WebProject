@@ -17,7 +17,7 @@ if(!$data){
     exit;
 }
 
-// Φτιάχνει δυναμικά το query μόνο με τα πεδία που υπάρχουν
+// Φτιάχνουμε δυναμικά το query μόνο με τα πεδία που υπάρχουν
 $fields = [];
 $params = [];
 $types = "";
@@ -43,7 +43,7 @@ if(isset($data['last_name']) && $data['last_name'] !== ""){
     $types .= "s";
 }
 
-// AM
+// AM (μόνο για φοιτητές)
 if(isset($data['am'])){
     $fields[] = "am = ?";
     $params[] = $data['am'];
