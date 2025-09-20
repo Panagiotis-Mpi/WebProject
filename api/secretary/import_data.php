@@ -34,6 +34,11 @@ $updated = 0;
 
 function handleUsers($users, $role, $stmt, &$inserted, &$updated){
     foreach($users as $u){
+        // Απορρίπτουμε οποιονδήποτε με role 'secretary'
+        if(isset($u['role']) && $u['role'] === 'secretary'){
+            continue;
+        }
+
         $email = $u['email'] ?? null;
         $password = isset($u['password']) ? password_hash($u['password'], PASSWORD_BCRYPT) : null;
         $first_name = $u['first_name'] ?? null;
@@ -42,7 +47,7 @@ function handleUsers($users, $role, $stmt, &$inserted, &$updated){
         $phone = $u['phone'] ?? null;
 
         if(!$email || !$password || !$first_name || !$last_name){
-            continue; // skip invalid
+            continue;
         }
 
         $stmt->bind_param("sssssss", $email, $password, $first_name, $last_name, $role, $am, $phone);
@@ -63,9 +68,7 @@ if(isset($data['students'])){
 if(isset($data['professors'])){
     handleUsers($data['professors'], 'professor', $stmt, $inserted, $updated);
 }
-if(isset($data['secretaries'])){
-    handleUsers($data['secretaries'], 'secretary', $stmt, $inserted, $updated);
-}
+
 
 $stmt->close();
 $conn->close();
