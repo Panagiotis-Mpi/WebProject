@@ -49,6 +49,7 @@ footer {
     padding: 0.7rem;
 }
 
+/* Main content */
 main {
     flex: 1;
     display: flex;
@@ -128,7 +129,7 @@ main {
     font-weight: bold;
 }
 
-/* Κουμπί επιστροφής */
+/* Κουμπί επιστροφής κάτω δεξιά */
 .back-btn {
     position: fixed;
     bottom: 20px;
