@@ -1,10 +1,10 @@
 <?php
 header('Content-Type: application/json');
-require '../../db_connection.php'; // προσαρμογή σύμφωνα με το δέντρο: api/auth -> ../../
+require '../../db_connection.php';
 
 session_start();
 
-// Ελέγχουμε ότι είναι POST
+
 if($_SERVER['REQUEST_METHOD'] !== 'POST'){
     echo json_encode([
         'success' => false,
