@@ -1,3 +1,0 @@
-<FilesMatch "\.(pdf)$">
-    Require all granted
-</FilesMatch>
