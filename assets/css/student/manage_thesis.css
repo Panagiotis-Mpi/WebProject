@@ -1,4 +1,4 @@
-body {
+
     font-family: Arial, sans-serif;
     background: #f5f5f5;
     min-height: 100vh;
@@ -57,95 +57,80 @@ main {
     align-items: center;
 }
 
-/* Topic container */
+/* Container for sections */
 .container {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-    max-width: 700px;
     width: 90%;
+    max-width: 800px;
     margin: 2rem auto;
 }
 
-.container h2 {
+/* Sections */
+section {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+h2, h3 {
     text-align: center;
     color: #004080;
-    margin-bottom: 1rem;
 }
 
-/* Lists */
-.container ul {
-    padding-left: 1.2rem;
-    margin-top: 0.5rem;
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    text-align: left;
 }
 
-/* Upload section */
-.upload-section {
-    margin-top: 1.5rem;
-    padding: 1rem;
+/* Inputs and selects */
+input, select {
+    padding: 0.5rem;
+    width: 95%;
     border: 1px solid #ccc;
-    border-radius: 8px;
-    background: #f9f9f9;
-}
-
-.upload-section h3 {
-    margin-bottom: 0.8rem;
-    color: #004080;
-}
-
-.upload-section input[type="file"] {
-    display: block;
+    border-radius: 5px;
     margin-bottom: 0.5rem;
 }
 
-.upload-section button {
+/* Buttons */
+button {
+    padding: 0.7rem 1rem;
+    border: none;
+    border-radius: 8px;
     background: #0066cc;
     color: white;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 5px;
     cursor: pointer;
+    font-size: 1rem;
     transition: background 0.3s, transform 0.2s;
 }
-.upload-section button:hover {
+button:hover {
     background: #004080;
     transform: translateY(-2px);
 }
 
-.upload-section p {
-    margin-top: 0.5rem;
+/* Message */
+#message {
+    margin-top: 1rem;
+    font-weight: bold;
 }
 
-/* Back button */
+/* Κουμπί επιστροφής κάτω δεξιά */
 .back-btn {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    padding: 0.8rem 1.5rem;
-    font-size: 1rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    background: #0066cc;
-    color: white;
-    transition: background 0.3s, transform 0.2s;
-    z-index: 100; 
-}
-
-.back-btn:hover {
-    background: #004080;
-    transform: translateY(-2px);
+    z-index: 100;
 }
 
 /* Responsive */
 @media (max-width: 600px) {
-    .container {
-        padding: 1.5rem;
-    }
-    .container h2 {
-        font-size: 1.4rem;
-    }
     header {
         flex-direction: column;
         text-align: center;
@@ -161,14 +146,7 @@ main {
         transform: none;
         margin-top: 0.5rem;
     }
-    .back-btn {
-        padding: 0.7rem 1.2rem;
-        font-size: 0.95rem;
-    }
-    .upload-section {
-        padding: 1rem;
-    }
-    .upload-section button {
-        width: 100%;
+    .container {
+        width: 95%;
     }
 }
