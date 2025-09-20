@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 if (isset($_SESSION['user_id'])) {
     echo json_encode([
         'loggedIn' => true,
-        'role' => $_SESSION['role'],   // χρησιμοποίησε το ίδιο key με το login.php
+        'role' => $_SESSION['role'],   
         'name' => $_SESSION['name'] ?? ''
     ]);
 } else {
