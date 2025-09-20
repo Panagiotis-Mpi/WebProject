@@ -74,10 +74,10 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("iii", $topic_id, $student_id, $supervisor_id);
 
 if ($stmt->execute()) {
-    // Πάρε το ID της νεοδημιουργηθείσας Διπλωματικής
+    // Πάρε το ID της νέας Διπλωματικής
     $thesis_id = $stmt->insert_id;
 
-    // Προσθήκη επιβλέποντα στην CommitteeMembers
+    // Προσθήκη επιβλέποντα στο CommitteeMembers
     $sql2 = "INSERT INTO CommitteeMembers (thesis_id, professor_id, role, status) 
              VALUES (?, ?, 'supervisor', 'accepted')";
     $stmt2 = $conn->prepare($sql2);
