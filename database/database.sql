@@ -2,9 +2,7 @@ DROP DATABASE IF EXISTS diplomatiki;
 CREATE DATABASE diplomatiki CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE diplomatiki;
 
--- =======================
--- USERS
--- =======================
+
 CREATE TABLE Users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -19,9 +17,7 @@ CREATE TABLE Users (
 CREATE INDEX idx_users_role ON Users(role);
 CREATE INDEX idx_users_am ON Users(am);
 
--- =======================
--- TOPICS
--- =======================
+
 CREATE TABLE Topics (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -33,9 +29,7 @@ CREATE TABLE Topics (
 
 CREATE INDEX idx_topics_creator ON Topics(creator_id);
 
--- =======================
--- THESES
--- =======================
+
 CREATE TABLE Theses (
     id INT AUTO_INCREMENT PRIMARY KEY,
     topic_id INT NOT NULL,
@@ -54,9 +48,7 @@ CREATE INDEX idx_theses_student ON Theses(student_id);
 CREATE INDEX idx_theses_supervisor ON Theses(supervisor_id);
 CREATE INDEX idx_theses_status ON Theses(status);
 
--- =======================
--- COMMITTEE MEMBERS
--- =======================
+
 CREATE TABLE CommitteeMembers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     thesis_id INT NOT NULL,
@@ -69,9 +61,7 @@ CREATE TABLE CommitteeMembers (
 
 CREATE INDEX idx_committeemembers_thesis ON CommitteeMembers(thesis_id);
 
--- =======================
--- NOTES
--- =======================
+
 CREATE TABLE Notes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     thesis_id INT NOT NULL,
@@ -83,9 +73,7 @@ CREATE TABLE Notes (
 
 CREATE INDEX idx_notes_thesis ON Notes(thesis_id);
 
--- =======================
--- STATUS HISTORY
--- =======================
+
 CREATE TABLE StatusHistory (
     id INT AUTO_INCREMENT PRIMARY KEY,
     thesis_id INT NOT NULL,
@@ -98,9 +86,7 @@ CREATE TABLE StatusHistory (
 
 CREATE INDEX idx_statushistory_thesis ON StatusHistory(thesis_id);
 
--- =======================
--- PRESENTATIONS
--- =======================
+
 CREATE TABLE Presentations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     thesis_id INT NOT NULL,
@@ -113,9 +99,7 @@ CREATE TABLE Presentations (
 
 CREATE INDEX idx_presentations_thesis ON Presentations(thesis_id);
 
--- =======================
--- GRADES
--- =======================
+
 CREATE TABLE Grades (
     id INT AUTO_INCREMENT PRIMARY KEY,
     thesis_id INT NOT NULL,
@@ -133,9 +117,7 @@ CREATE TABLE Grades (
 
 CREATE INDEX idx_grades_thesis ON Grades(thesis_id);
 
--- =======================
--- ANNOUNCEMENTS
--- =======================
+
 CREATE TABLE Announcements (
     id INT AUTO_INCREMENT PRIMARY KEY,
     thesis_id INT NOT NULL,
@@ -147,3 +129,4 @@ CREATE TABLE Announcements (
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE INDEX idx_announcements_thesis ON Announcements(thesis_id);
+CREATE INDEX idx_announcements_start ON Announcements(start_date);
