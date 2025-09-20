@@ -7,6 +7,7 @@ body {
     flex-direction: column;
 }
 
+/* Header */
 header {
     position: relative;
     background: #004080;
