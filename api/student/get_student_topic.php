@@ -48,7 +48,6 @@ $stmt2->execute();
 $res2 = $stmt2->get_result();
 $committee = $res2->fetch_all(MYSQLI_ASSOC);
 
-// Κλείσιμο statements & connection
 $stmt->close();
 $stmt2->close();
 $conn->close();
