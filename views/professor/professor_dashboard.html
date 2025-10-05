@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Καθηγητής - Dashboard</title>
+<link rel="stylesheet" href="../../assets/css/professor/professor_dashboard.css">
+</head>
+<body>
+
+<header>
+    <img src="../../assets/img/ceid.png" alt="CEID Logo" class="logo">
+    <h1>Καθηγητής - Dashboard</h1>
+    <button class="logout-btn" onclick="logout()">Αποσύνδεση</button>
+</header>
+
+<main>
+    <div class="container menu">
+        <button onclick="location.href='professor_view_topics.html'">Προβολή Θεμάτων</button>
+        <button onclick="location.href='create_topic.html'">Δημιουργία Θέματος</button>
+        <button onclick="location.href='assign_topic.html'">Ανάθεση Θέματος</button>
+        <button onclick="location.href='view_invitations.html'">Προβολή Προσκλήσεων Τριμελούς</button>
+        <button onclick="location.href='statistics.html'">Προβολή Στατιστικών</button>
+        <button onclick="location.href='evaluate_theses.html'">Αξιολόγηση Διπλωματικών</button>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2025 Πανεπιστήμιο Πατρών - Πλατφόρμα Διπλωματικών - Τμήμα Μηχανικών Η/Υ & Πληροφορικής</p>
+</footer>
+
+<script>
+function logout(){
+    fetch('../../api/auth/logout.php')
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) window.location.href='../auth/login.html';
+            else alert('Σφάλμα κατά την αποσύνδεση');
+        })
+        .catch(() => alert('Σφάλμα επικοινωνίας με τον server'));
+}
+</script>
+
+</body>
+</html>
